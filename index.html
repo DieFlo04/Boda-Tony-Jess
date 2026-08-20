@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Antonio & Jessica — Nos Casamos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#12201a;
+    --bg-deep-2:#1c3226;
+    --parchment:#f5efdd;
+    --parchment-2:#efe6cd;
+    --ink:#2a2216;
+    --ink-soft:#5a4f3d;
+    --gold:#c6a667;
+    --gold-soft:#e4ce9b;
+    --blush:#c98a7d;
+    --line: rgba(198,166,103,.45);
+    --shadow: 0 25px 60px rgba(0,0,0,.35);
+    --serif: 'Cormorant Garamond', serif;
+    --sans: 'Jost', sans-serif;
+    --script: 'Mrs Saint Delafield', cursive;
+    --r: 4px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:var(--sans);
+    background:
+      radial-gradient(1200px 800px at 50% -10%, var(--bg-deep-2), transparent 60%),
+      var(--bg-deep);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  body.not-opened{overflow:hidden; height:100dvh;}
+  button{font-family:inherit; cursor:pointer; border:none; background:none;}
+  input,textarea{font-family:inherit;}
+  a{color:inherit;}
+  ::selection{background:var(--gold-soft); color:var(--ink);}
+
+  /* ---------- Botanical corner ornament ---------- */
+  .corner{position:absolute; width:46px; height:46px; opacity:.75; pointer-events:none;}
+  .corner.tl{top:14px; left:14px;}
+  .corner.tr{top:14px; right:14px; transform:scaleX(-1);}
+  .corner.bl{bottom:14px; left:14px; transform:scaleY(-1);}
+  .corner.br{bottom:14px; right:14px; transform:scale(-1,-1);}
+
+  /* ---------- Scroll container ---------- */
+  #scrollContainer{
+    height:100dvh; width:100%;
+    overflow-y:auto; overflow-x:hidden;
+    scroll-snap-type:y mandatory;
+    scroll-behavior:smooth;
+  }
+  .panel{
+    min-height:100dvh; width:100%;
+    display:flex; align-items:center; justify-content:center;
+    padding:48px 20px; position:relative;
+    scroll-snap-align:start; scroll-snap-stop:always;
+  }
+  .eyebrow{
+    font-family:var(--sans); font-size:11px; letter-spacing:.28em; text-transform:uppercase;
+    color:var(--gold); text-align:center; margin-bottom:10px; font-weight:500;
+  }
+  .card{
+    position:relative; width:100%; max-width:420px;
+    background:linear-gradient(180deg,var(--parchment),var(--parchment-2));
+    border-radius:var(--r); border:1px solid var(--line);
+    box-shadow:var(--shadow);
+    padding:46px 30px; text-align:center;
+  }
+  .card h2{
+    font-family:var(--serif); font-style:italic; font-weight:500;
+    font-size:clamp(26px,7vw,32px); color:var(--ink); margin-bottom:6px;
+  }
+  .rule{
+    width:56px; height:1px; background:var(--gold); margin:16px auto; opacity:.7;
+  }
+  .card p{ font-size:15px; line-height:1.7; color:var(--ink-soft); }
+  .btn{
+    margin-top:26px; display:inline-block; padding:14px 34px;
+    border:1px solid var(--gold); color:var(--ink);
+    font-size:12px; letter-spacing:.22em; text-transform:uppercase;
+    border-radius:999px; background:transparent; transition:.25s;
+  }
+  .btn:hover, .btn:focus-visible{ background:var(--gold); color:#1c1204; }
+  .btn:focus-visible{ outline:2px solid var(--ink); outline-offset:3px; }
+  .btn.solid{ background:var(--gold); color:#241a06; }
+  .btn.solid:hover{ background:var(--gold-soft); }
+
+  .scroll-hint{
+    position:absolute; bottom:26px; left:50%; transform:translateX(-50%);
+    color:var(--gold-soft); font-size:11px; letter-spacing:.2em; text-transform:uppercase;
+    display:flex; flex-direction:column; align-items:center; gap:8px; opacity:.85;
+  }
+  .scroll-hint svg{ animation:bob 1.8s ease-in-out infinite; }
+  @keyframes bob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(6px);} }
+
+  /* ---------- Cover / Envelope ---------- */
+  #cover{
+    position:fixed; inset:0; z-index:50;
+    display:flex; align-items:center; justify-content:center;
+    background:
+      radial-gradient(900px 600px at 50% 20%, #223b2c, transparent 60%),
+      var(--bg-deep);
+    transition:transform .9s cubic-bezier(.65,0,.35,1), opacity .9s ease;
+  }
+  #cover.away{ transform:translateY(-100%); opacity:0; pointer-events:none; }
+  .envelope-wrap{ perspective:1400px; width:min(78vw,300px); }
+  .envelope{
+    position:relative; width:100%; aspect-ratio:3/2;
+    background:linear-gradient(160deg,#f5efdd,#e9dfc2);
+    border-radius:6px; box-shadow:var(--shadow);
+  }
+  .flap{
+    position:absolute; top:0; left:0; width:100%; height:56%;
+    background:linear-gradient(160deg,#f7f1e0,#e6dbbc);
+    clip-path:polygon(0 0,100% 0,50% 92%);
+    transform-origin:top center; transition:transform .8s cubic-bezier(.65,0,.35,1);
+    border-radius:6px 6px 0 0;
+    box-shadow:0 2px 6px rgba(0,0,0,.15);
+    z-index:3;
+  }
+  #cover.opening .flap{ transform:rotateX(180deg); }
+  .letter{
+    position:absolute; left:8%; right:8%; bottom:6%; height:70%;
+    background:var(--parchment); border-radius:3px; z-index:1;
+    box-shadow:0 -4px 10px rgba(0,0,0,.08) inset;
+    transition:transform .9s cubic-bezier(.2,.8,.2,1) .25s;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #cover.opening .letter{ transform:translateY(-46%); }
+  .letter span{ font-family:var(--script); font-size:30px; color:var(--gold); }
+  .seal{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:64px; height:64px; border-radius:50%; z-index:4;
+    background:radial-gradient(circle at 35% 30%, #d99a83, var(--blush) 60%, #a75f52 100%);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 14px rgba(0,0,0,.35);
+    font-family:var(--script); color:#fbe9df; font-size:20px;
+    transition:opacity .4s, transform .4s;
+  }
+  #cover.opening .seal{ opacity:0; transform:translate(-50%,-50%) scale(.6); }
+  .open-btn{
+    margin-top:40px; width:100%; text-align:center;
+  }
+  .cover-caption{
+    margin-top:18px; color:var(--gold-soft); font-size:12px; letter-spacing:.18em; text-transform:uppercase; text-align:center; opacity:.85;
+  }
+
+  /* ---------- Names panel ---------- */
+  #names .bg{
+    position:absolute; inset:0; z-index:0;
+    background-image:linear-gradient(180deg, rgba(18,32,26,.35), rgba(18,32,26,.85)), url('https://placehold.co/900x1400/1c3226/e4ce9b?text=Foto+de+la+pareja');
+    background-size:cover; background-position:center;
+  }
+  #names .content{ position:relative; z-index:1; text-align:center; color:var(--parchment); }
+  #names .eyebrow{color:var(--gold-soft);}
+  #names .script{ font-family:var(--script); font-size:clamp(46px,15vw,72px); color:var(--parchment); line-height:1; }
+  #names .amp{ font-family:var(--serif); font-style:italic; color:var(--gold); font-size:28px; display:block; margin:4px 0; }
+  #names .sub{ font-family:var(--serif); font-style:italic; font-size:17px; color:var(--gold-soft); margin-top:14px; }
+
+  /* ---------- Countdown ---------- */
+  .countdown-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:22px; }
+  .cd-box{ background:var(--bg-deep); border:1px solid var(--line); border-radius:var(--r); padding:14px 4px; }
+  .cd-box .num{ font-family:var(--serif); font-size:28px; color:var(--gold-soft); }
+  .cd-box .lab{ font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--parchment); opacity:.7; margin-top:4px; }
+
+  /* ---------- Map modal preview ---------- */
+  .map-frame{ width:100%; height:220px; border:0; border-radius:var(--r); margin-top:18px; filter:sepia(.15) saturate(1.1); }
+
+  /* ---------- Carousel ---------- */
+  #gallery .card{ max-width:460px; padding:36px 0; }
+  .carousel{ display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory; padding:0 24px 6px; -webkit-overflow-scrolling:touch; }
+  .carousel::-webkit-scrollbar{ display:none; }
+  .carousel img{
+    flex:0 0 72%; scroll-snap-align:center; height:380px; object-fit:cover;
+    border-radius:10px; box-shadow:0 14px 30px rgba(0,0,0,.25);
+  }
+  .dots{ display:flex; justify-content:center; gap:6px; margin-top:16px; }
+  .dots span{ width:6px; height:6px; border-radius:50%; background:var(--line); transition:.2s; }
+  .dots span.active{ background:var(--gold); width:16px; border-radius:4px; }
+
+  /* ---------- Dress code ---------- */
+  .dress-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px; }
+  .dress-grid img{ width:100%; height:200px; object-fit:cover; border-radius:8px; }
+  .palette{ display:flex; justify-content:center; gap:10px; margin-top:18px; }
+  .palette span{ width:26px; height:26px; border-radius:50%; border:1px solid var(--line); display:inline-block; }
+
+  /* ---------- QR ---------- */
+  .qr-box{ background:#fff; padding:14px; border-radius:10px; display:inline-block; margin-top:18px; box-shadow:var(--shadow); }
+  .qr-box img{ display:block; width:170px; height:170px; }
+
+  /* ---------- Closing ---------- */
+  #closing .content{ text-align:center; }
+  #closing .script{ font-family:var(--script); font-size:clamp(48px,16vw,80px); color:var(--gold-soft); }
+  #closing .seal-mini{
+    width:56px; height:56px; border-radius:50%; margin:22px auto 0;
+    background:radial-gradient(circle at 35% 30%, #d99a83, var(--blush) 60%, #a75f52 100%);
+    display:flex; align-items:center; justify-content:center; font-family:var(--script); color:#fbe9df; font-size:18px;
+  }
+  #closing p{ color:var(--parchment); opacity:.75; font-size:13px; margin-top:16px; letter-spacing:.06em; }
+
+  /* ---------- Modals ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:100; display:flex; align-items:flex-end; justify-content:center;
+    background:rgba(10,16,12,.55); opacity:0; pointer-events:none; transition:opacity .3s;
+  }
+  .modal-overlay.open{ opacity:1; pointer-events:auto; }
+  .modal{
+    width:100%; max-width:460px; max-height:88dvh; overflow-y:auto;
+    background:var(--parchment); border-radius:20px 20px 0 0;
+    padding:30px 26px 36px; position:relative;
+    transform:translateY(30px); transition:transform .35s cubic-bezier(.2,.8,.2,1);
+    box-shadow:0 -20px 50px rgba(0,0,0,.4);
+  }
+  .modal-overlay.open .modal{ transform:translateY(0); }
+  .modal-close{
+    position:absolute; top:14px; right:16px; width:34px; height:34px; border-radius:50%;
+    background:var(--bg-deep); color:var(--gold-soft); font-size:16px; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .modal h3{ font-family:var(--serif); font-style:italic; font-size:24px; margin-bottom:4px; padding-right:30px; }
+  .modal .rule{ margin:14px 0 18px; }
+  .modal p{ font-size:14.5px; line-height:1.75; color:var(--ink-soft); text-align:left; }
+  .note-list{ list-style:none; text-align:left; margin-top:6px; }
+  .note-list li{ font-size:14.5px; line-height:1.7; color:var(--ink-soft); padding:9px 0 9px 22px; position:relative; border-bottom:1px dashed var(--line); }
+  .note-list li:last-child{ border-bottom:0; }
+  .note-list li::before{ content:'✦'; position:absolute; left:0; color:var(--gold); font-size:11px; top:11px; }
+
+  .field{ text-align:left; margin-top:16px; }
+  .field label{ display:block; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:6px; }
+  .field input, .field textarea{
+    width:100%; padding:12px 14px; border:1px solid var(--line); border-radius:8px;
+    background:#fffdf6; font-size:14.5px; color:var(--ink); resize:vertical;
+  }
+  .field input:focus, .field textarea:focus{ outline:2px solid var(--gold); outline-offset:1px; }
+  .radio-group{ display:flex; gap:10px; margin-top:16px; }
+  .radio-pill{ flex:1; }
+  .radio-pill input{ display:none; }
+  .radio-pill span{
+    display:block; text-align:center; padding:13px 8px; border:1px solid var(--line); border-radius:999px;
+    font-size:13px; color:var(--ink-soft); transition:.2s;
+  }
+  .radio-pill input:checked + span{ background:var(--gold); color:#241a06; border-color:var(--gold); font-weight:500; }
+
+  .bank-box{ background:var(--bg-deep); color:var(--parchment); border-radius:10px; padding:16px 18px; margin-top:14px; text-align:left; }
+  .bank-box .k{ font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold-soft); }
+  .bank-box .v{ font-size:15px; margin:2px 0 12px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .copy-btn{ font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--gold-soft); border:1px solid var(--line); border-radius:999px; padding:5px 10px; flex-shrink:0; }
+
+  .thanks{ display:none; text-align:center; padding:20px 0; }
+  .thanks.show{ display:block; }
+  .thanks .mark{ font-family:var(--serif); font-style:italic; font-size:26px; color:var(--ink); }
+  .thanks p{ text-align:center; margin-top:8px; }
+  form.hide, .modal > .btn.hide, .modal > .rule.hide, .modal > h3.hide, .modal > p.hide{ display:none; }
+
+  @media (prefers-reduced-motion:reduce){
+    *{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
+  }
+</style>
+</head>
+<body class="not-opened">
+
+<!-- =============== PORTADA / SOBRE =============== -->
+<div id="cover">
+  <div>
+    <div class="envelope-wrap">
+      <div class="envelope">
+        <div class="letter"><span>A &amp; J</span></div>
+        <div class="flap"></div>
+        <button class="seal" id="openBtn" aria-label="Abrir invitación">A&amp;J</button>
+      </div>
+    </div>
+    <div class="open-btn">
+      <button class="btn solid" id="openBtnText">Abrir</button>
+    </div>
+    <div class="cover-caption">Tienes una invitación</div>
+  </div>
+</div>
+
+<!-- =============== CONTENIDO =============== -->
+<div id="scrollContainer">
+
+  <!-- NOMBRES -->
+  <section class="panel" id="names">
+    <div class="bg"></div>
+    <div class="content">
+      <div class="eyebrow">Nos casamos</div>
+      <div class="script">Antonio</div>
+      <span class="amp">&amp;</span>
+      <div class="script">Jessica</div>
+      <div class="sub">Con la bendición de Dios y de nuestras familias</div>
+    </div>
+    <div class="scroll-hint">
+      Desliza
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </div>
+  </section>
+
+  <!-- CUENTA REGRESIVA -->
+  <section class="panel" id="countdown">
+    <div class="card">
+      <svg class="corner tl" viewBox="0 0 46 46"><path d="M2 44 C2 20 20 2 44 2" stroke="#c6a667" stroke-width="1.4" fill="none"/><circle cx="2" cy="44" r="2.5" fill="#c6a667"/></svg>
+      <svg class="corner tr" viewBox="0 0 46 46"><path d="M2 44 C2 20 20 2 44 2" stroke="#c6a667" stroke-width="1.4" fill="none"/><circle cx="2" cy="44" r="2.5" fill="#c6a667"/></svg>
+      <svg class="corner bl" viewBox="0 0 46 46"><path d="M2 44 C2 20 20 2 44 2" stroke="#c6a667" stroke-width="1.4" fill="none"/><circle cx="2" cy="44" r="2.5" fill="#c6a667"/></svg>
+      <svg class="corner br" viewBox="0 0 46 46"><path d="M2 44 C2 20 20 2 44 2" stroke="#c6a667" stroke-width="1.4" fill="none"/><circle cx="2" cy="44" r="2.5" fill="#c6a667"/></svg>
+      <div class="eyebrow">Falta muy poco</div>
+      <h2>Cuenta regresiva</h2>
+      <div class="rule"></div>
+      <div class="countdown-grid">
+        <div class="cd-box"><div class="num" id="cd-days">00</div><div class="lab">Días</div></div>
+        <div class="cd-box"><div class="num" id="cd-hours">00</div><div class="lab">Hrs</div></div>
+        <div class="cd-box"><div class="num" id="cd-mins">00</div><div class="lab">Min</div></div>
+        <div class="cd-box"><div class="num" id="cd-secs">00</div><div class="lab">Seg</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FECHA / UBICACIÓN -->
+  <section class="panel" id="dateSection">
+    <div class="card">
+      <svg class="corner tl" viewBox="0 0 46 46"><path d="M2 44 C2 20 20 2 44 2" stroke="#c6a667" stroke-width="1.4" fill="none"/></svg>
+      <svg class="corner tr" viewBox="0 0 46 46"><path d="M2 44 C2 20 20 2 44 2" stroke="#c6a667" stroke-width="1.4" fill="none"/></svg>
+      <svg class="corner bl" viewBox="0 0 46 46"><path d="M2 44 C2 20 20 2 44 2" stroke="#c6a667" stroke-width="1.4" fill="none"/></svg>
+      <svg class="corner br" viewBox="0 0 46 46"><path d="M2 44 C2 20 20 2 44 2" stroke="#c6a667" stroke-width="1.4" fill="none"/></svg>
+      <div class="eyebrow">El gran día</div>
+      <h2 id="date-display">—</h2>
+      <div class="rule"></div>
+      <p id="place-display">—</p>
+      <button class="btn" id="btnLocation">¿Cómo llegar?</button>
+    </div>
+  </section>
+
+  <!-- GALERÍA -->
+  <section class="panel" id="gallery">
+    <div class="card">
+      <div class="eyebrow">Nuestra historia</div>
+      <h2>Galería</h2>
+      <div class="rule"></div>
+      <div class="carousel" id="carousel">
+        <img src="https://placehold.co/700x900/1c3226/e4ce9b?text=Foto+1" alt="Foto de la pareja 1" loading="lazy">
+        <img src="https://placehold.co/700x900/243e2f/e4ce9b?text=Foto+2" alt="Foto de la pareja 2" loading="lazy">
+        <img src="https://placehold.co/700x900/1c3226/e4ce9b?text=Foto+3" alt="Foto de la pareja 3" loading="lazy">
+        <img src="https://placehold.co/700x900/243e2f/e4ce9b?text=Foto+4" alt="Foto de la pareja 4" loading="lazy">
+      </div>
+      <div class="dots" id="carouselDots"></div>
+    </div>
+  </section>
+
+  <!-- MÚSICA -->
+  <section class="panel" id="music">
+    <div class="card">
+      <div class="eyebrow">Ambienta la fiesta</div>
+      <h2>Música</h2>
+      <div class="rule"></div>
+      <p>Ayúdanos a armar el playlist de la noche. ¿Qué canción no puede faltar en la pista?</p>
+      <button class="btn solid" id="btnMusic">Sugerir Canción</button>
+    </div>
+  </section>
+
+  <!-- DRESS CODE -->
+  <section class="panel" id="dresscode">
+    <div class="card">
+      <div class="eyebrow">Código de vestimenta</div>
+      <h2>Dress Code</h2>
+      <div class="rule"></div>
+      <p>Formal — te invitamos a acompañarnos con elegancia.</p>
+      <div class="dress-grid">
+        <img src="https://placehold.co/400x500/12201a/e4ce9b?text=Traje+formal" alt="Referencia de traje formal para hombre">
+        <img src="https://placehold.co/400x500/243e2f/e4ce9b?text=Vestido+formal" alt="Referencia de vestido formal para mujer">
+      </div>
+      <div class="palette">
+        <span style="background:#12201a"></span>
+        <span style="background:#c6a667"></span>
+        <span style="background:#c98a7d"></span>
+        <span style="background:#f5efdd"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIPS Y NOTAS -->
+  <section class="panel" id="tips">
+    <div class="card">
+      <div class="eyebrow">Antes de venir</div>
+      <h2>Tips y Notas</h2>
+      <div class="rule"></div>
+      <p>Unos detalles para que disfrutes la celebración al máximo.</p>
+      <button class="btn" id="btnTips">Ver más</button>
+    </div>
+  </section>
+
+  <!-- REGALOS -->
+  <section class="panel" id="gifts">
+    <div class="card">
+      <div class="eyebrow">Con cariño</div>
+      <h2>Mesa de Regalos</h2>
+      <div class="rule"></div>
+      <p>Tu presencia es nuestro mejor regalo. Si deseas tener un detalle con nosotros, aquí te contamos cómo.</p>
+      <button class="btn" id="btnGifts">Ver más</button>
+    </div>
+  </section>
+
+  <!-- QR FOTOS -->
+  <section class="panel" id="qr">
+    <div class="card">
+      <div class="eyebrow">Captura el momento</div>
+      <h2>Comparte tus Fotos</h2>
+      <div class="rule"></div>
+      <p>Escanea el código para subir las fotos y videos que tomes durante la boda. ¡Queremos ver la fiesta desde tu lente!</p>
+      <div class="qr-box">
+        <img id="qrImg" src="" alt="Código QR para subir fotos de la boda">
+      </div>
+      <div>
+        <a class="btn solid" id="btnUploadPhotos" href="#" target="_blank" rel="noopener" style="margin-top:18px;">Subir fotos</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- RSVP -->
+  <section class="panel" id="rsvp">
+    <div class="card">
+      <div class="eyebrow">Última confirmación</div>
+      <h2>Confirmar Asistencia</h2>
+      <div class="rule"></div>
+      <p>Nos encantaría contar contigo. Confirma antes de <span id="rsvp-deadline">—</span>.</p>
+      <button class="btn solid" id="btnRsvp">Confirmar Asistencia</button>
+    </div>
+  </section>
+
+  <!-- CIERRE -->
+  <section class="panel" id="closing">
+    <div class="content">
+      <div class="script">Antonio &amp; Jessica</div>
+      <div class="seal-mini">A&amp;J</div>
+      <p>Gracias por ser parte de nuestra historia</p>
+    </div>
+  </section>
+
+</div>
+
+<!-- =============== MODALES =============== -->
+
+<!-- Ubicación -->
+<div class="modal-overlay" id="modal-location" data-modal>
+  <div class="modal">
+    <button class="modal-close" data-close>&times;</button>
+    <h3>¿Cómo llegar?</h3>
+    <div class="rule" style="margin-left:0"></div>
+    <p id="modal-location-address">—</p>
+    <iframe class="map-frame" id="mapFrame" src="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <a class="btn solid" id="openMapsBtn" href="#" target="_blank" rel="noopener" style="margin-top:18px; display:block; text-align:center;">Abrir en Google Maps</a>
+  </div>
+</div>
+
+<!-- Música -->
+<div class="modal-overlay" id="modal-music" data-modal>
+  <div class="modal">
+    <button class="modal-close" data-close>&times;</button>
+    <h3>Sugerir Canción</h3>
+    <div class="rule" style="margin-left:0"></div>
+    <form id="formMusic">
+      <div class="field">
+        <label for="m-name">Nombre completo</label>
+        <input id="m-name" name="nombre" type="text" required placeholder="Tu nombre">
+      </div>
+      <div class="field">
+        <label for="m-song">Nombre de la canción</label>
+        <input id="m-song" name="cancion" type="text" required placeholder="Ej. Perfect">
+      </div>
+      <div class="field">
+        <label for="m-artist">Autor / Intérprete</label>
+        <input id="m-artist" name="autor" type="text" required placeholder="Ej. Ed Sheeran">
+      </div>
+      <div class="field">
+        <label for="m-yt">Link de YouTube (opcional)</label>
+        <input id="m-yt" name="youtube" type="url" placeholder="https://youtube.com/...">
+      </div>
+      <button class="btn solid" type="submit" style="width:100%; margin-top:22px;">Guardar Canción</button>
+    </form>
+    <div class="thanks" id="thanksMusic">
+      <div class="mark">¡Gracias!</div>
+      <p>Tu canción ya está en la lista de la fiesta 🎶</p>
+    </div>
+  </div>
+</div>
+
+<!-- Tips -->
+<div class="modal-overlay" id="modal-tips" data-modal>
+  <div class="modal">
+    <button class="modal-close" data-close>&times;</button>
+    <h3>Tips y Notas</h3>
+    <div class="rule" style="margin-left:0"></div>
+    <ul class="note-list">
+      <li>¡Por favor ser puntuales!</li>
+      <li>Queremos que disfrutes de esta fiesta al máximo, por eso decidimos que sea un evento sólo para adultos.</li>
+      <li>¡Confirmar asistencia a la brevedad, antes de la fecha indicada!</li>
+      <li>Lleva abrigo para disfrutar de los espacios exteriores.</li>
+      <li>Olvídate de todo y a disfrutar!!!</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Regalos -->
+<div class="modal-overlay" id="modal-gifts" data-modal>
+  <div class="modal">
+    <button class="modal-close" data-close>&times;</button>
+    <h3>Mesa de Regalos</h3>
+    <div class="rule" style="margin-left:0"></div>
+    <p>Para quienes deseen hacer un regalo en efectivo, contaremos con sobres disponibles para depositar en el cofre. También pueden contribuir mediante:</p>
+    <div class="bank-box">
+      <div class="k">Depósito bancario</div>
+      <div class="v"><span id="bank-account">Cuenta XXXX XXXX XXXX XXXX</span><button class="copy-btn" data-copy="bank-account">Copiar</button></div>
+      <div class="k">PayPal</div>
+      <div class="v"><span id="bank-paypal">correopaypal@gmail.com</span><button class="copy-btn" data-copy="bank-paypal">Copiar</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- RSVP -->
+<div class="modal-overlay" id="modal-rsvp" data-modal>
+  <div class="modal">
+    <button class="modal-close" data-close>&times;</button>
+    <h3>Confirmar Asistencia</h3>
+    <div class="rule" style="margin-left:0"></div>
+    <form id="formRsvp">
+      <p style="text-align:left; font-weight:500; color:var(--ink);">¿Asistes a la celebración?</p>
+      <div class="radio-group">
+        <label class="radio-pill">
+          <input type="radio" name="asiste" value="si" required>
+          <span>¡Sí, confirmo!</span>
+        </label>
+        <label class="radio-pill">
+          <input type="radio" name="asiste" value="no">
+          <span>No puedo</span>
+        </label>
+      </div>
+      <div class="field">
+        <label for="r-name">Nombre completo</label>
+        <input id="r-name" name="nombre" type="text" required placeholder="Tu nombre">
+      </div>
+      <div class="field">
+        <label for="r-note">Dato importante (opcional)</label>
+        <textarea id="r-note" name="nota" rows="3" placeholder="Ej. Soy vegetariano"></textarea>
+      </div>
+      <button class="btn solid" type="submit" style="width:100%; margin-top:22px;">Enviar Asistencia</button>
+    </form>
+    <div class="thanks" id="thanksRsvp">
+      <div class="mark">¡Gracias!</div>
+      <p>Tu respuesta fue registrada. ¡Nos vemos pronto!</p>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   CONFIGURACIÓN — edita solo esta sección con tus datos
+   ========================================================= */
+const CONFIG = {
+  weddingDateISO: "2026-12-12T17:00:00",     // Fecha y hora de la boda
+  ceremonyPlaceName: "Jardín Las Rosas",      // Nombre del lugar
+  ceremonyAddress: "Av. de las Rosas 123, Guadalajara, Jalisco",
+  mapsQuery: "Jardín Las Rosas, Guadalajara, Jalisco",
+  rsvpDeadline: "15 de noviembre de 2026",
+  bankAccount: "Cuenta XXXX XXXX XXXX XXXX",
+  paypalEmail: "correopaypal@gmail.com",
+  photosUploadUrl: "https://photos.google.com/share/TU-ENLACE-AQUI", // álbum donde subirán fotos
+  // Pega aquí tu endpoint de Formspree (https://formspree.io) para recibir
+  // por correo las respuestas de "Sugerir Canción" y "Confirmar Asistencia".
+  // Si lo dejas vacío, las respuestas solo se guardan en el navegador del invitado.
+  formEndpoint: ""
+};
+
+/* ---------- Utilidades ---------- */
+const $ = (sel, ctx=document) => ctx.querySelector(sel);
+const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
+
+/* ---------- Rellenar datos desde CONFIG ---------- */
+function formatDate(iso){
+  const d = new Date(iso);
+  const opts = { day:'numeric', month:'long', year:'numeric' };
+  const s = d.toLocaleDateString('es-MX', opts);
+  const time = d.toLocaleTimeString('es-MX', { hour:'numeric', minute:'2-digit' });
+  return s.charAt(0).toUpperCase() + s.slice(1) + ' · ' + time + ' hrs';
+}
+$('#date-display').textContent = formatDate(CONFIG.weddingDateISO);
+$('#place-display').textContent = CONFIG.ceremonyPlaceName + ' — ' + CONFIG.ceremonyAddress;
+$('#modal-location-address').textContent = CONFIG.ceremonyPlaceName + ', ' + CONFIG.ceremonyAddress;
+$('#rsvp-deadline').textContent = CONFIG.rsvpDeadline;
+$('#bank-account').textContent = CONFIG.bankAccount;
+$('#bank-paypal').textContent = CONFIG.paypalEmail;
+
+const mapsEmbed = 'https://www.google.com/maps?q=' + encodeURIComponent(CONFIG.mapsQuery) + '&output=embed';
+const mapsLink = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(CONFIG.mapsQuery);
+$('#mapFrame').src = mapsEmbed;
+$('#openMapsBtn').href = mapsLink;
+
+$('#btnUploadPhotos').href = CONFIG.photosUploadUrl;
+$('#qrImg').src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(CONFIG.photosUploadUrl);
+
+/* ---------- Envelope opening ---------- */
+const cover = $('#cover');
+function openInvitation(){
+  cover.classList.add('opening');
+  setTimeout(()=>{
+    cover.classList.add('away');
+    document.body.classList.remove('not-opened');
+    document.body.classList.add('opened');
+  }, 850);
+}
+$('#openBtn').addEventListener('click', openInvitation);
+$('#openBtnText').addEventListener('click', openInvitation);
+
+/* ---------- Countdown ---------- */
+function updateCountdown(){
+  const target = new Date(CONFIG.weddingDateISO).getTime();
+  const now = Date.now();
+  let diff = Math.max(0, target - now);
+  const days = Math.floor(diff / 86400000); diff -= days*86400000;
+  const hours = Math.floor(diff / 3600000); diff -= hours*3600000;
+  const mins = Math.floor(diff / 60000); diff -= mins*60000;
+  const secs = Math.floor(diff / 1000);
+  $('#cd-days').textContent = String(days).padStart(2,'0');
+  $('#cd-hours').textContent = String(hours).padStart(2,'0');
+  $('#cd-mins').textContent = String(mins).padStart(2,'0');
+  $('#cd-secs').textContent = String(secs).padStart(2,'0');
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+/* ---------- Carousel dots ---------- */
+const carousel = $('#carousel');
+const dotsWrap = $('#carouselDots');
+const slides = $$('img', carousel);
+slides.forEach((_, i) => {
+  const d = document.createElement('span');
+  if(i===0) d.classList.add('active');
+  dotsWrap.appendChild(d);
+});
+carousel.addEventListener('scroll', () => {
+  const idx = Math.round(carousel.scrollLeft / (carousel.clientWidth*0.72+14));
+  $$('span', dotsWrap).forEach((d,i)=> d.classList.toggle('active', i===idx));
+}, { passive:true });
+
+/* ---------- Modales genéricos ---------- */
+function openModal(id){
+  $(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(overlay){
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+$$('[data-modal]').forEach(overlay=>{
+  overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(overlay); });
+  $('[data-close]', overlay).addEventListener('click', ()=> closeModal(overlay));
+});
+$('#btnLocation').addEventListener('click', ()=> openModal('#modal-location'));
+$('#btnMusic').addEventListener('click', ()=> openModal('#modal-music'));
+$('#btnTips').addEventListener('click', ()=> openModal('#modal-tips'));
+$('#btnGifts').addEventListener('click', ()=> openModal('#modal-gifts'));
+$('#btnRsvp').addEventListener('click', ()=> openModal('#modal-rsvp'));
+
+/* ---------- Envío de formularios (Música y RSVP) ---------- */
+async function submitForm(data, type){
+  // Guarda una copia local por si no hay servicio conectado
+  const key = type === 'music' ? 'songSuggestions' : 'rsvpResponses';
+  const list = JSON.parse(localStorage.getItem(key) || '[]');
+  list.push({ ...data, fecha: new Date().toISOString() });
+  localStorage.setItem(key, JSON.stringify(list));
+
+  if(CONFIG.formEndpoint){
+    try{
+      await fetch(CONFIG.formEndpoint, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json', 'Accept':'application/json' },
+        body: JSON.stringify({ tipo:type, ...data })
+      });
+    }catch(err){ console.warn('No se pudo enviar al servidor, se guardó localmente.', err); }
+  }
+}
+
+$('#formMusic').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  await submitForm(Object.fromEntries(fd), 'music');
+  e.target.classList.add('hide');
+  $('#thanksMusic').classList.add('show');
+  setTimeout(()=>{ closeModal($('#modal-music')); e.target.reset(); e.target.classList.remove('hide'); $('#thanksMusic').classList.remove('show'); }, 2200);
+});
+
+$('#formRsvp').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  await submitForm(Object.fromEntries(fd), 'rsvp');
+  e.target.classList.add('hide');
+  $('#thanksRsvp').classList.add('show');
+  setTimeout(()=>{ closeModal($('#modal-rsvp')); e.target.reset(); e.target.classList.remove('hide'); $('#thanksRsvp').classList.remove('show'); }, 2200);
+});
+
+/* ---------- Copiar datos bancarios ---------- */
+$$('.copy-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const text = $('#' + btn.dataset.copy).textContent;
+    navigator.clipboard?.writeText(text).then(()=>{
+      const original = btn.textContent;
+      btn.textContent = '¡Copiado!';
+      setTimeout(()=> btn.textContent = original, 1500);
+    });
+  });
+});
+</script>
+</body>
+</html>
