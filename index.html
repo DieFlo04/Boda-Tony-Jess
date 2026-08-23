@@ -42,13 +42,6 @@
   a{color:inherit;}
   ::selection{background:var(--gold-soft); color:var(--ink);}
 
-  /* ---------- Botanical corner ornament ---------- */
-  .corner{position:absolute; width:46px; height:46px; opacity:.75; pointer-events:none;}
-  .corner.tl{top:14px; left:14px;}
-  .corner.tr{top:14px; right:14px; transform:scaleX(-1);}
-  .corner.bl{bottom:14px; left:14px; transform:scaleY(-1);}
-  .corner.br{bottom:14px; right:14px; transform:scale(-1,-1);}
-
   /* ---------- Scroll container ---------- */
   #scrollContainer{
     height:100dvh; width:100%;
@@ -58,9 +51,14 @@
   }
   .panel{
     min-height:100dvh; width:100%;
-    display:flex; align-items:center; justify-content:center;
-    padding:48px 20px; position:relative;
+    display:flex; flex-direction:column;
+    position:relative;
     scroll-snap-align:start; scroll-snap-stop:always;
+  }
+  .panel-inner{
+    flex:1; width:100%;
+    display:flex; align-items:center; justify-content:center;
+    padding:28px 20px;
   }
   .eyebrow{
     font-family:var(--sans); font-size:11px; letter-spacing:.28em; text-transform:uppercase;
@@ -71,7 +69,7 @@
     background:linear-gradient(180deg,var(--parchment),var(--parchment-2));
     border-radius:var(--r); border:1px solid var(--line);
     box-shadow:var(--shadow);
-    padding:46px 30px; text-align:center;
+    padding:34px 30px; text-align:center;
   }
   .card h2{
     font-family:var(--serif); font-style:italic; font-weight:500;
@@ -93,12 +91,25 @@
   .btn.solid:hover{ background:var(--gold-soft); }
 
   .scroll-hint{
-    position:absolute; bottom:26px; left:50%; transform:translateX(-50%);
+    position:absolute; bottom:calc(clamp(64px,15vw,108px) + 18px); left:50%; transform:translateX(-50%);
     color:var(--gold-soft); font-size:11px; letter-spacing:.2em; text-transform:uppercase;
-    display:flex; flex-direction:column; align-items:center; gap:8px; opacity:.85;
+    display:flex; flex-direction:column; align-items:center; gap:8px; opacity:.85; z-index:2;
   }
   .scroll-hint svg{ animation:bob 1.8s ease-in-out infinite; }
   @keyframes bob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(6px);} }
+
+  /* ---------- Bandas de rosas (bordes entre apartados) ---------- */
+  .rose-divider{
+    width:100%; height:clamp(64px,15vw,108px); flex:0 0 auto;
+    background-color:var(--bg-deep);
+    background-size:cover; background-position:center; background-repeat:no-repeat;
+  }
+  .rose-divider.no-image{
+    background-image:linear-gradient(180deg, rgba(198,166,103,.22), rgba(198,166,103,0)) !important;
+  }
+  .rose-divider.overlay{ position:absolute; left:0; width:100%; z-index:1; }
+  .rose-divider.overlay.rose-divider--top{ top:0; }
+  .rose-divider.overlay.rose-divider--bottom{ bottom:0; }
 
   /* ---------- Cover / Envelope ---------- */
   #cover{
@@ -145,9 +156,7 @@
     transition:opacity .4s, transform .4s;
   }
   #cover.opening .seal{ opacity:0; transform:translate(-50%,-50%) scale(.6); }
-  .open-btn{
-    margin-top:40px; width:100%; text-align:center;
-  }
+  .open-btn{ margin-top:40px; width:100%; text-align:center; }
   .cover-caption{
     margin-top:18px; color:var(--gold-soft); font-size:12px; letter-spacing:.18em; text-transform:uppercase; text-align:center; opacity:.85;
   }
@@ -158,7 +167,10 @@
     background-image:linear-gradient(180deg, rgba(18,32,26,.35), rgba(18,32,26,.85)), url('https://media-cldnry.s-nbcnews.com/image/upload/v1675808888/telemundocms/images/article/cover/2019/02/06/pareja-feliz.jpg');
     background-size:cover; background-position:center;
   }
-  #names .content{ position:relative; z-index:1; text-align:center; color:var(--parchment); }
+  #names .content{
+    position:relative; z-index:1; text-align:center; color:var(--parchment);
+    flex:1; width:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
   #names .eyebrow{color:var(--gold-soft);}
   #names .script{ font-family:var(--script); font-size:clamp(46px,15vw,72px); color:var(--parchment); line-height:1; }
   #names .amp{ font-family:var(--serif); font-style:italic; color:var(--gold); font-size:28px; display:block; margin:4px 0; }
@@ -170,11 +182,21 @@
   .cd-box .num{ font-family:var(--serif); font-size:28px; color:var(--gold-soft); }
   .cd-box .lab{ font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--parchment); opacity:.7; margin-top:4px; }
 
+  /* ---------- Icono de línea (estilo Canva) para cada tarjeta ---------- */
+  .card-icon{ display:flex; align-items:center; justify-content:center; margin-bottom:8px; }
+  .card-icon svg{ width:44px; height:44px; stroke:var(--gold); stroke-width:1.3; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+
+  /* ---------- Ceremonia / Celebración ---------- */
+  .schedule{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px; }
+  .schedule-item{ background:var(--bg-deep); border:1px solid var(--line); border-radius:var(--r); padding:12px 6px; }
+  .schedule-item .lab{ font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold-soft); opacity:.85; }
+  .schedule-item .val{ font-family:var(--serif); font-size:20px; color:var(--parchment); margin-top:3px; display:block; }
+
   /* ---------- Map modal preview ---------- */
   .map-frame{ width:100%; height:220px; border:0; border-radius:var(--r); margin-top:18px; filter:sepia(.15) saturate(1.1); }
 
   /* ---------- Carousel ---------- */
-  #gallery .card{ max-width:460px; padding:36px 0; }
+  #gallery .card{ max-width:460px; padding:34px 0; }
   .carousel{ display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory; padding:0 24px 6px; -webkit-overflow-scrolling:touch; }
   .carousel::-webkit-scrollbar{ display:none; }
   .carousel img{
@@ -196,7 +218,10 @@
   .qr-box img{ display:block; width:170px; height:170px; }
 
   /* ---------- Closing ---------- */
-  #closing .content{ text-align:center; }
+  #closing .content{
+    position:relative; z-index:1; text-align:center;
+    flex:1; width:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
   #closing .script{ font-family:var(--script); font-size:clamp(48px,16vw,80px); color:var(--gold-soft); }
   #closing .seal-mini{
     width:56px; height:56px; border-radius:50%; margin:22px auto 0;
@@ -304,131 +329,172 @@
 
   <!-- CUENTA REGRESIVA -->
   <section class="panel" id="countdown">
-    <div class="card">
-      <svg class="corner tl" viewBox="0 0 46 46"><path d="M2 44 C2 20 20 2 44 2" stroke="#c6a667" stroke-width="1.4" fill="none"/><circle cx="2" cy="44" r="2.5" fill="#c6a667"/></svg>
-      <svg class="corner tr" viewBox="0 0 46 46"><path d="M2 44 C2 20 20 2 44 2" stroke="#c6a667" stroke-width="1.4" fill="none"/><circle cx="2" cy="44" r="2.5" fill="#c6a667"/></svg>
-      <svg class="corner bl" viewBox="0 0 46 46"><path d="M2 44 C2 20 20 2 44 2" stroke="#c6a667" stroke-width="1.4" fill="none"/><circle cx="2" cy="44" r="2.5" fill="#c6a667"/></svg>
-      <svg class="corner br" viewBox="0 0 46 46"><path d="M2 44 C2 20 20 2 44 2" stroke="#c6a667" stroke-width="1.4" fill="none"/><circle cx="2" cy="44" r="2.5" fill="#c6a667"/></svg>
-      <div class="eyebrow">Falta muy poco</div>
-      <h2>Cuenta regresiva</h2>
-      <div class="rule"></div>
-      <div class="countdown-grid">
-        <div class="cd-box"><div class="num" id="cd-days">00</div><div class="lab">Días</div></div>
-        <div class="cd-box"><div class="num" id="cd-hours">00</div><div class="lab">Hrs</div></div>
-        <div class="cd-box"><div class="num" id="cd-mins">00</div><div class="lab">Min</div></div>
-        <div class="cd-box"><div class="num" id="cd-secs">00</div><div class="lab">Seg</div></div>
+    <div class="panel-inner">
+      <div class="card">
+        <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M14 6h20M14 42h20M15 6c0 8 18 8 18 8s-18 0-18 8s18 0 18 8"/><path d="M33 6c0 8-18 8-18 8s18 0 18 8s-18 0-18 8"/></svg></div>
+        <div class="eyebrow">Falta muy poco</div>
+        <h2>Cuenta regresiva</h2>
+        <div class="rule"></div>
+        <div class="countdown-grid">
+          <div class="cd-box"><div class="num" id="cd-days">00</div><div class="lab">Días</div></div>
+          <div class="cd-box"><div class="num" id="cd-hours">00</div><div class="lab">Hrs</div></div>
+          <div class="cd-box"><div class="num" id="cd-mins">00</div><div class="lab">Min</div></div>
+          <div class="cd-box"><div class="num" id="cd-secs">00</div><div class="lab">Seg</div></div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- FECHA / UBICACIÓN -->
-  <section class="panel" id="dateSection">
-    <div class="card">
-      <svg class="corner tl" viewBox="0 0 46 46"><path d="M2 44 C2 20 20 2 44 2" stroke="#c6a667" stroke-width="1.4" fill="none"/></svg>
-      <svg class="corner tr" viewBox="0 0 46 46"><path d="M2 44 C2 20 20 2 44 2" stroke="#c6a667" stroke-width="1.4" fill="none"/></svg>
-      <svg class="corner bl" viewBox="0 0 46 46"><path d="M2 44 C2 20 20 2 44 2" stroke="#c6a667" stroke-width="1.4" fill="none"/></svg>
-      <svg class="corner br" viewBox="0 0 46 46"><path d="M2 44 C2 20 20 2 44 2" stroke="#c6a667" stroke-width="1.4" fill="none"/></svg>
-      <div class="eyebrow">El gran día</div>
-      <h2 id="date-display">—</h2>
-      <div class="rule"></div>
-      <p id="place-display">—</p>
-      <button class="btn" id="btnLocation">¿Cómo llegar?</button>
+  <!-- CEREMONIA -->
+  <section class="panel" id="ceremony">
+    <div class="panel-inner">
+      <div class="card">
+        <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M24 5v8M20 9h8"/><path d="M24 13l14 11v18H10V24z"/><path d="M19 32c0-4 2-6 5-6s5 2 5 6v10H19z"/><path d="M6 42h36"/></svg></div>
+        <div class="eyebrow">Nos unimos en</div>
+        <h2>Ceremonia</h2>
+        <div class="rule"></div>
+        <div class="schedule">
+          <div class="schedule-item"><span class="lab">Fecha</span><span class="val" id="ceremony-date">—</span></div>
+          <div class="schedule-item"><span class="lab">Hora</span><span class="val" id="ceremony-time">—</span></div>
+        </div>
+        <p id="ceremony-place" style="margin-top:16px;">—</p>
+        <button class="btn" id="btnLocationCeremony">¿Cómo llegar?</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CELEBRACIÓN -->
+  <section class="panel" id="celebration">
+    <div class="panel-inner">
+      <div class="card">
+        <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M14 6h8l-1 12a3 3 0 0 1-6 0z"/><path d="M18 18v14M13 32h10"/><path d="M34 10h6l-.6 8a2.4 2.4 0 0 1-4.8 0z"/><path d="M37 18v14M32 32h10"/></svg></div>
+        <div class="eyebrow">Continuamos en</div>
+        <h2>Celebración</h2>
+        <div class="rule"></div>
+        <div class="schedule">
+          <div class="schedule-item"><span class="lab">Fecha</span><span class="val" id="celebration-date">—</span></div>
+          <div class="schedule-item"><span class="lab">Hora</span><span class="val" id="celebration-time">—</span></div>
+        </div>
+        <p id="celebration-place" style="margin-top:16px;">—</p>
+        <button class="btn" id="btnLocationCelebration">¿Cómo llegar?</button>
+      </div>
     </div>
   </section>
 
   <!-- GALERÍA -->
   <section class="panel" id="gallery">
-    <div class="card">
-      <div class="eyebrow">Nuestra historia</div>
-      <h2>Galería</h2>
-      <div class="rule"></div>
-      <div class="carousel" id="carousel">
-        <img src="https://media-cldnry.s-nbcnews.com/image/upload/v1675808888/telemundocms/images/article/cover/2019/02/06/pareja-feliz.jpg" alt="Foto de la pareja 1" loading="lazy">
-        <img src="https://plus.unsplash.com/premium_photo-1700353612860-bd8ab8d71f05?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8YW1vciUyMGRlJTIwcGFyZWphfGVufDB8fDB8fHww" alt="Foto de la pareja 2" loading="lazy">
-        <img src="https://i.pinimg.com/736x/ac/c7/7c/acc77cebb0a57157d818097ff6135cfb.jpg" alt="Foto de la pareja 3" loading="lazy">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqD5KTgsoP3iLQVKfLkWTeca6N2n0ZdC6HmE5ihbwEMCpzyeziO0PBnRo&s=10" alt="Foto de la pareja 4" loading="lazy">
+    <div class="panel-inner">
+      <div class="card">
+        <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M24 40C10 30 6 22 6 15a9 9 0 0 1 18-1a9 9 0 0 1 18 1c0 7-4 15-18 25z"/></svg></div>
+        <div class="eyebrow">Nuestra historia</div>
+        <h2>Galería</h2>
+        <div class="rule"></div>
+        <div class="carousel" id="carousel">
+          <img src="images/foto-1.jpg" alt="Foto de la pareja 1" loading="lazy">
+          <img src="images/foto-2.jpg" alt="Foto de la pareja 2" loading="lazy">
+          <img src="images/foto-3.jpg" alt="Foto de la pareja 3" loading="lazy">
+          <img src="images/foto-4.jpg" alt="Foto de la pareja 4" loading="lazy">
+        </div>
+        <div class="dots" id="carouselDots"></div>
       </div>
-      <div class="dots" id="carouselDots"></div>
     </div>
   </section>
 
   <!-- MÚSICA -->
   <section class="panel" id="music">
-    <div class="card">
-      <div class="eyebrow">Ambienta la fiesta</div>
-      <h2>Música</h2>
-      <div class="rule"></div>
-      <p>Ayúdanos a armar el playlist de la noche. ¿Qué canción no puede faltar en la pista?</p>
-      <button class="btn solid" id="btnMusic">Sugerir Canción</button>
+    <div class="panel-inner">
+      <div class="card">
+        <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M18 34a5 5 0 1 1 0-10a5 5 0 0 1 0 10z"/><path d="M23 24V8l14-3v16"/><path d="M32 21a5 5 0 1 1 5 5"/></svg></div>
+        <div class="eyebrow">Ambienta la fiesta</div>
+        <h2>Música</h2>
+        <div class="rule"></div>
+        <p>Ayúdanos a armar el playlist de la noche. ¿Qué canción no puede faltar en la pista?</p>
+        <button class="btn solid" id="btnMusic">Sugerir Canción</button>
+      </div>
     </div>
   </section>
 
   <!-- DRESS CODE -->
   <section class="panel" id="dresscode">
-    <div class="card">
-      <div class="eyebrow">Código de vestimenta</div>
-      <h2>Dress Code</h2>
-      <div class="rule"></div>
-      <p>Formal — te invitamos a acompañarnos con elegancia.</p>
-      <div class="dress-grid">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEffLBXZNVJ-pH7GjBGtQtUV2B84u4U78kZVv7JqvjCg&s=10" alt="Referencia de traje formal para hombre">
-        <img src="https://sharetribe.imgix.net/5fc75098-d907-4a37-95a5-770989517a9c/66cbd0ed-5575-4136-855b-133def04d5fe?auto=format&fit=clip&h=2400&w=2400&s=e1360ad590e2d94b2bcab18375d00a10" alt="Referencia de vestido formal para mujer">
-      </div>
-      <div class="palette">
-        <span style="background:#12201a"></span>
-        <span style="background:#c6a667"></span>
-        <span style="background:#c98a7d"></span>
-        <span style="background:#f5efdd"></span>
+    <div class="panel-inner">
+      <div class="card">
+        <div class="card-icon"><svg viewBox="0 0 48 48"><circle cx="24" cy="9" r="3"/><path d="M24 12v5"/><path d="M24 17l18 13a3 3 0 0 1-2 5H8a3 3 0 0 1-2-5z"/><path d="M14 30h20"/></svg></div>
+        <div class="eyebrow">Código de vestimenta</div>
+        <h2>Dress Code</h2>
+        <div class="rule"></div>
+        <p>Formal — te invitamos a acompañarnos con elegancia.</p>
+        <div class="dress-grid">
+          <img src="images/dresscode-hombre.jpg" alt="Referencia de traje formal para hombre">
+          <img src="images/dresscode-mujer.jpg" alt="Referencia de vestido formal para mujer">
+        </div>
+        <div class="palette">
+          <span style="background:#12201a"></span>
+          <span style="background:#c6a667"></span>
+          <span style="background:#c98a7d"></span>
+          <span style="background:#f5efdd"></span>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- TIPS Y NOTAS -->
   <section class="panel" id="tips">
-    <div class="card">
-      <div class="eyebrow">Antes de venir</div>
-      <h2>Tips y Notas</h2>
-      <div class="rule"></div>
-      <p>Unos detalles para que disfrutes la celebración al máximo.</p>
-      <button class="btn" id="btnTips">Ver más</button>
+    <div class="panel-inner">
+      <div class="card">
+        <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M12 6h18l6 6v30H12z"/><path d="M30 6v6h6"/><path d="M18 22h12M18 28h12M18 34h8"/></svg></div>
+        <div class="eyebrow">Antes de venir</div>
+        <h2>Tips y Notas</h2>
+        <div class="rule"></div>
+        <p>Unos detalles para que disfrutes la celebración al máximo.</p>
+        <button class="btn" id="btnTips">Ver más</button>
+      </div>
     </div>
   </section>
 
   <!-- REGALOS -->
   <section class="panel" id="gifts">
-    <div class="card">
-      <div class="eyebrow">Con cariño</div>
-      <h2>Mesa de Regalos</h2>
-      <div class="rule"></div>
-      <p>Tu presencia es nuestro mejor regalo. Si deseas tener un detalle con nosotros, aquí te contamos cómo.</p>
-      <button class="btn" id="btnGifts">Ver más</button>
+    <div class="panel-inner">
+      <div class="card">
+        <div class="card-icon"><svg viewBox="0 0 48 48"><rect x="8" y="18" width="32" height="9" rx="1.5"/><rect x="11" y="27" width="26" height="15" rx="1.5"/><path d="M24 18v24"/><path d="M24 18c-2-6-13-6-9 0M24 18c2-6 13-6 9 0"/></svg></div>
+        <div class="eyebrow">Con cariño</div>
+        <h2>Regalos</h2>
+        <div class="rule"></div>
+        <p>Si quieres darnos algo más que tu hermosa presencia…</p>
+        <button class="btn" id="btnGifts">Ver más</button>
+      </div>
     </div>
   </section>
 
   <!-- QR FOTOS -->
   <section class="panel" id="qr">
-    <div class="card">
-      <div class="eyebrow">Captura el momento</div>
-      <h2>Comparte tus Fotos</h2>
-      <div class="rule"></div>
-      <p>Escanea el código para subir las fotos y videos que tomes durante la boda. ¡Queremos ver la fiesta desde tu lente!</p>
-      <div class="qr-box">
-        <img id="qrImg" src="" alt="Código QR para subir fotos de la boda">
-      </div>
-      <div>
-        <a class="btn solid" id="btnUploadPhotos" href="#" target="_blank" rel="noopener" style="margin-top:18px;">Subir fotos</a>
+    <div class="panel-inner">
+      <div class="card">
+        <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M6 16h8l3-5h14l3 5h8v24H6z"/><circle cx="24" cy="28" r="8"/></svg></div>
+        <div class="eyebrow">Captura el momento</div>
+        <h2>Comparte tus Fotos</h2>
+        <div class="rule"></div>
+        <p>Escanea el código para subir las fotos y videos que tomes durante la boda. ¡Queremos ver la fiesta desde tu lente!</p>
+        <div class="qr-box">
+          <img id="qrImg" src="" alt="Código QR para subir fotos de la boda">
+        </div>
+        <div>
+          <a class="btn solid" id="btnUploadPhotos" href="#" target="_blank" rel="noopener" style="margin-top:18px;">Subir fotos</a>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- RSVP -->
   <section class="panel" id="rsvp">
-    <div class="card">
-      <div class="eyebrow">Última confirmación</div>
-      <h2>Confirmar Asistencia</h2>
-      <div class="rule"></div>
-      <p>Nos encantaría contar contigo. Confirma antes de <span id="rsvp-deadline">—</span>.</p>
-      <button class="btn solid" id="btnRsvp">Confirmar Asistencia</button>
+    <div class="panel-inner">
+      <div class="card">
+        <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M9 12h30M9 24h30M9 36h20"/><path d="M9 12l3 3 5-5M9 24l3 3 5-5"/></svg></div>
+        <div class="eyebrow">Última confirmación</div>
+        <h2>Confirmación</h2>
+        <div class="rule"></div>
+        <p>¿Nos acompañas en este día tan especial? Confirma antes de <span id="rsvp-deadline">—</span>.</p>
+        <button class="btn solid" id="btnRsvp">Confirmar asistencia</button>
+      </div>
     </div>
   </section>
 
@@ -445,15 +511,27 @@
 
 <!-- =============== MODALES =============== -->
 
-<!-- Ubicación -->
-<div class="modal-overlay" id="modal-location" data-modal>
+<!-- Ubicación Ceremonia -->
+<div class="modal-overlay" id="modal-location-ceremony" data-modal>
   <div class="modal">
     <button class="modal-close" data-close>&times;</button>
-    <h3>¿Cómo llegar?</h3>
+    <h3>¿Cómo llegar? — Ceremonia</h3>
     <div class="rule" style="margin-left:0"></div>
-    <p id="modal-location-address">—</p>
-    <iframe class="map-frame" id="mapFrame" src="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-    <a class="btn solid" id="openMapsBtn" href="#" target="_blank" rel="noopener" style="margin-top:18px; display:block; text-align:center;">Abrir en Google Maps</a>
+    <p id="modal-ceremony-address">—</p>
+    <iframe class="map-frame" id="mapFrameCeremony" src="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <a class="btn solid" id="openMapsBtnCeremony" href="#" target="_blank" rel="noopener" style="margin-top:18px; display:block; text-align:center;">Abrir en Google Maps</a>
+  </div>
+</div>
+
+<!-- Ubicación Celebración -->
+<div class="modal-overlay" id="modal-location-celebration" data-modal>
+  <div class="modal">
+    <button class="modal-close" data-close>&times;</button>
+    <h3>¿Cómo llegar? — Celebración</h3>
+    <div class="rule" style="margin-left:0"></div>
+    <p id="modal-celebration-address">—</p>
+    <iframe class="map-frame" id="mapFrameCelebration" src="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <a class="btn solid" id="openMapsBtnCelebration" href="#" target="_blank" rel="noopener" style="margin-top:18px; display:block; text-align:center;">Abrir en Google Maps</a>
   </div>
 </div>
 
@@ -561,10 +639,35 @@
    CONFIGURACIÓN — edita solo esta sección con tus datos
    ========================================================= */
 const CONFIG = {
-  weddingDateISO: "2026-12-12T17:00:00",     // Fecha y hora de la boda
-  ceremonyPlaceName: "Goretti Eventos",      // Nombre del lugar
-  ceremonyAddress: "Periférico, C. López Cotilla 414, Tonalá, Jal.",
-  mapsQuery: "Periférico, C. López Cotilla 414, Tonalá, Jal.",
+
+  // --- Imagen o video de la banda de rosas (borde entre apartados) ---
+  // Coloca tu archivo en una carpeta "images" junto a este archivo,
+  // en tu repositorio de GitHub, y escribe aquí su ruta relativa.
+  // - Imagen estática: usa .jpg o .png (mínimo 1200px de ancho).
+  // - Video animado en loop: usa .mp4 o .webm (clip corto, 5-10 segundos,
+  //   sin audio, se detecta automático por la extensión del archivo).
+  roseBorderImage: "images/rose-border.jpg",
+
+  // --- Ceremonia ---
+  ceremony: {
+    dateISO: "2026-12-05T17:00:00",
+    dateLabel: "5 de diciembre",
+    timeLabel: "5:00 PM",
+    placeName: "Templo de Santa Rita de Casia",
+    address: "Av Guadalupe 1668A, Chapalita Oriente, 45040 Zapopan, Jal.",
+    mapsQuery: "Av Guadalupe 1668A, Chapalita Oriente, 45040 Zapopan, Jal."
+  },
+
+  // --- Celebración / Recepción ---
+  celebration: {
+    dateISO: "2026-12-05T19:30:00",
+    dateLabel: "5 de diciembre",
+    timeLabel: "7:30 PM",
+    placeName: "Goretti Eventos",
+    address: "Periférico, C. López Cotilla 414, Tonalá, Jal.",
+    mapsQuery: "Periférico, C. López Cotilla 414, Tonalá, Jal."
+  },
+
   rsvpDeadline: "15 de noviembre de 2026",
   bankAccount: "Cuenta XXXX XXXX XXXX XXXX",
   paypalEmail: "correopaypal@gmail.com",
@@ -572,35 +675,132 @@ const CONFIG = {
   // Pega aquí tu endpoint de Formspree (https://formspree.io) para recibir
   // por correo las respuestas de "Sugerir Canción" y "Confirmar Asistencia".
   // Si lo dejas vacío, las respuestas solo se guardan en el navegador del invitado.
-  formEndpoint: ""
+  formEndpoint: "",
+
+  // --- Foto de fondo de cada apartado ---
+  // Cada apartado puede tener su propia foto de fondo (bodas, flores, etc.)
+  // detrás de la tarjeta. Coloca tus fotos en una carpeta "images/backgrounds"
+  // y escribe aquí la ruta de cada una. Si dejas una ruta que no existe,
+  // ese apartado simplemente se queda con el fondo verde de siempre
+  // (no se rompe nada, no aparece un ícono de "imagen rota").
+  //
+  // Cada foto se recorta y estira automáticamente para llenar la pantalla
+  // de cualquier dispositivo (celular, tablet, PC) sin deformarse.
+  // Si el recorte le corta una parte importante a la foto (por ejemplo,
+  // se comen las flores y solo se ve pasto), puedes escribir la entrada
+  // como un objeto en vez de solo texto, agregando "position" para decirle
+  // qué parte de la foto priorizar. Ejemplos de position:
+  //   "center top"    -> prioriza la parte de ARRIBA de la foto
+  //   "center bottom" -> prioriza la parte de ABAJO de la foto
+  //   "center 30%"    -> prioriza un punto específico (0%=arriba, 100%=abajo)
+  sectionBackgrounds: {
+    countdown:   "images/backgrounds/countdown.jpg",
+    ceremony:    "images/backgrounds/ceremony.jpg",
+    celebration: "images/backgrounds/celebration.jpg",
+    gallery:     "images/backgrounds/gallery.jpg",
+    music:       "images/backgrounds/music.jpg",
+    dresscode:   "images/backgrounds/dresscode.jpg",
+    tips:        "images/backgrounds/tips.jpg",
+    gifts:       "images/backgrounds/gifts.jpg",
+    qr:          "images/backgrounds/qr.jpg",
+    // Ejemplo de cómo ajustar el recorte de una foto en particular:
+    // rsvp: { src: "images/backgrounds/rsvp.jpg", position: "center top" },
+    rsvp:        "images/backgrounds/rsvp.jpg"
+  }
 };
 
 /* ---------- Utilidades ---------- */
 const $ = (sel, ctx=document) => ctx.querySelector(sel);
 const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
 
-/* ---------- Rellenar datos desde CONFIG ---------- */
-function formatDate(iso){
-  const d = new Date(iso);
-  const opts = { day:'numeric', month:'long', year:'numeric' };
-  const s = d.toLocaleDateString('es-MX', opts);
-  const time = d.toLocaleTimeString('es-MX', { hour:'numeric', minute:'2-digit' });
-  return s.charAt(0).toUpperCase() + s.slice(1) + ' · ' + time + ' hrs';
-}
-$('#date-display').textContent = formatDate(CONFIG.weddingDateISO);
-$('#place-display').textContent = CONFIG.ceremonyPlaceName + ' — ' + CONFIG.ceremonyAddress;
-$('#modal-location-address').textContent = CONFIG.ceremonyPlaceName + ', ' + CONFIG.ceremonyAddress;
+/* ---------- Rellenar Ceremonia / Celebración ---------- */
+$('#ceremony-date').textContent = CONFIG.ceremony.dateLabel;
+$('#ceremony-time').textContent = CONFIG.ceremony.timeLabel;
+$('#ceremony-place').textContent = CONFIG.ceremony.placeName + ' — ' + CONFIG.ceremony.address;
+$('#modal-ceremony-address').textContent = CONFIG.ceremony.placeName + ', ' + CONFIG.ceremony.address;
+
+$('#celebration-date').textContent = CONFIG.celebration.dateLabel;
+$('#celebration-time').textContent = CONFIG.celebration.timeLabel;
+$('#celebration-place').textContent = CONFIG.celebration.placeName + ' — ' + CONFIG.celebration.address;
+$('#modal-celebration-address').textContent = CONFIG.celebration.placeName + ', ' + CONFIG.celebration.address;
+
 $('#rsvp-deadline').textContent = CONFIG.rsvpDeadline;
 $('#bank-account').textContent = CONFIG.bankAccount;
 $('#bank-paypal').textContent = CONFIG.paypalEmail;
 
-const mapsEmbed = 'https://www.google.com/maps?q=' + encodeURIComponent(CONFIG.mapsQuery) + '&output=embed';
-const mapsLink = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(CONFIG.mapsQuery);
-$('#mapFrame').src = mapsEmbed;
-$('#openMapsBtn').href = mapsLink;
+const ceremonyMapsEmbed = 'https://www.google.com/maps?q=' + encodeURIComponent(CONFIG.ceremony.mapsQuery) + '&output=embed';
+const ceremonyMapsLink = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(CONFIG.ceremony.mapsQuery);
+$('#mapFrameCeremony').src = ceremonyMapsEmbed;
+$('#openMapsBtnCeremony').href = ceremonyMapsLink;
+
+const celebrationMapsEmbed = 'https://www.google.com/maps?q=' + encodeURIComponent(CONFIG.celebration.mapsQuery) + '&output=embed';
+const celebrationMapsLink = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(CONFIG.celebration.mapsQuery);
+$('#mapFrameCelebration').src = celebrationMapsEmbed;
+$('#openMapsBtnCelebration').href = celebrationMapsLink;
 
 $('#btnUploadPhotos').href = CONFIG.photosUploadUrl;
 $('#qrImg').src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(CONFIG.photosUploadUrl);
+
+/* ---------- Foto de fondo por apartado ----------
+   Se pinta directamente como fondo del <section>, así que la tarjeta
+   (que siempre tiene su propio color sólido) queda encima sin problema
+   y no hace falta tocar el HTML. El degradado verde oscuro va SIEMPRE
+   encima de la foto para que todas las fotos —aunque sean de tonos muy
+   distintos entre sí— se vean unificadas con el resto de la invitación. */
+Object.entries(CONFIG.sectionBackgrounds).forEach(([id, cfg]) => {
+  const panel = document.getElementById(id);
+  if(!panel || !cfg) return;
+  const src = typeof cfg === 'string' ? cfg : cfg.src;
+  const position = (typeof cfg === 'object' && cfg.position) ? cfg.position : 'center';
+  if(!src) return;
+  panel.style.backgroundImage =
+    'linear-gradient(180deg, rgba(18,32,26,.58), rgba(18,32,26,.74)), url(\'' + src + '\')';
+  panel.style.backgroundSize = 'cover';
+  panel.style.backgroundPosition = position;
+  panel.style.backgroundRepeat = 'no-repeat';
+});
+
+/* ---------- Bandas de rosas entre apartados ----------
+   La portada (nombres) no lleva borde propio arriba ni abajo del todo;
+   el primer borde aparece justo AL SALIR de la portada, como límite
+   entre "Nos casamos" y "Cuenta regresiva". A partir de ahí, cada
+   apartado agrega solo su borde de ABAJO, que sirve a la vez como
+   borde superior del siguiente (así nunca se duplica). */
+function addRoseDivider(panelEl, position, overlay){
+  const div = document.createElement('div');
+  div.className = 'rose-divider rose-divider--' + position + (overlay ? ' overlay' : '');
+  if(position === 'top'){ panelEl.insertBefore(div, panelEl.firstChild); }
+  else{ panelEl.appendChild(div); }
+  return div;
+}
+const allPanels = $$('.panel');
+const roseDividerEls = [];
+allPanels.forEach((panel, i) => {
+  const overlay = panel.id === 'names' || panel.id === 'closing';
+  // Nota: ya NO se agrega borde arriba del primer apartado (la portada).
+  roseDividerEls.push(addRoseDivider(panel, 'bottom', overlay));
+});
+// Aplicar la banda configurada a todos los bordes.
+// Si CONFIG.roseBorderImage termina en .mp4 o .webm, se reproduce como
+// video en loop (silencioso y automático) para un efecto animado.
+// Si es una imagen normal (.jpg, .png, .gif...), se usa como fondo estático.
+const isVideoBorder = /\.(mp4|webm)$/i.test(CONFIG.roseBorderImage);
+if(isVideoBorder){
+  roseDividerEls.forEach(d => {
+    const vid = document.createElement('video');
+    vid.src = CONFIG.roseBorderImage;
+    vid.autoplay = true; vid.loop = true; vid.muted = true; vid.playsInline = true;
+    vid.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+    vid.onerror = () => d.classList.add('no-image');
+    d.appendChild(vid);
+  });
+} else {
+  roseDividerEls.forEach(d => { d.style.backgroundImage = `url('${CONFIG.roseBorderImage}')`; });
+  // Si la imagen no existe todavía, se muestra un degradado dorado en su lugar
+  const roseCheck = new Image();
+  roseCheck.onerror = () => roseDividerEls.forEach(d => d.classList.add('no-image'));
+  roseCheck.src = CONFIG.roseBorderImage;
+}
 
 /* ---------- Envelope opening ---------- */
 const cover = $('#cover');
@@ -615,9 +815,9 @@ function openInvitation(){
 $('#openBtn').addEventListener('click', openInvitation);
 $('#openBtnText').addEventListener('click', openInvitation);
 
-/* ---------- Countdown ---------- */
+/* ---------- Countdown (apunta a la Ceremonia) ---------- */
 function updateCountdown(){
-  const target = new Date(CONFIG.weddingDateISO).getTime();
+  const target = new Date(CONFIG.ceremony.dateISO).getTime();
   const now = Date.now();
   let diff = Math.max(0, target - now);
   const days = Math.floor(diff / 86400000); diff -= days*86400000;
@@ -659,7 +859,8 @@ $$('[data-modal]').forEach(overlay=>{
   overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(overlay); });
   $('[data-close]', overlay).addEventListener('click', ()=> closeModal(overlay));
 });
-$('#btnLocation').addEventListener('click', ()=> openModal('#modal-location'));
+$('#btnLocationCeremony').addEventListener('click', ()=> openModal('#modal-location-ceremony'));
+$('#btnLocationCelebration').addEventListener('click', ()=> openModal('#modal-location-celebration'));
 $('#btnMusic').addEventListener('click', ()=> openModal('#modal-music'));
 $('#btnTips').addEventListener('click', ()=> openModal('#modal-tips'));
 $('#btnGifts').addEventListener('click', ()=> openModal('#modal-gifts'));
