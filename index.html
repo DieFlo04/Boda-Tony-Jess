@@ -91,27 +91,16 @@
   .btn.solid:hover{ background:var(--gold-soft); }
 
   .scroll-hint{
-    position:absolute; bottom:calc(clamp(64px,15vw,108px) + 18px); left:50%; transform:translateX(-50%);
+    position:absolute; bottom:26px; left:50%; transform:translateX(-50%);
     color:var(--gold-soft); font-size:11px; letter-spacing:.2em; text-transform:uppercase;
     display:flex; flex-direction:column; align-items:center; gap:8px; opacity:.85; z-index:2;
   }
   .scroll-hint svg{ animation:bob 1.8s ease-in-out infinite; }
   @keyframes bob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(6px);} }
 
-  /* ---------- Bandas de rosas (bordes entre apartados) ---------- */
-  .rose-divider{
-    width:100%; height:clamp(64px,15vw,108px); flex:0 0 auto;
-    background-color:var(--bg-deep);
-    background-size:cover; background-position:center; background-repeat:no-repeat;
-  }
-  .rose-divider.no-image{
-    background-image:linear-gradient(180deg, rgba(198,166,103,.22), rgba(198,166,103,0)) !important;
-  }
-  .rose-divider.overlay{ position:absolute; left:0; width:100%; z-index:1; }
-  .rose-divider.overlay.rose-divider--top{ top:0; }
-  .rose-divider.overlay.rose-divider--bottom{ bottom:0; }
-
-  /* ---------- Cover / Envelope ---------- */
+  /* ================================================================
+     ---------- Cover / Envelope (rediseñado y decorado) ----------
+     ================================================================ */
   #cover{
     position:fixed; inset:0; z-index:50;
     display:flex; align-items:center; justify-content:center;
@@ -119,14 +108,84 @@
       radial-gradient(900px 600px at 50% 20%, #223b2c, transparent 60%),
       var(--bg-deep);
     transition:transform .9s cubic-bezier(.65,0,.35,1), opacity .9s ease;
+    overflow:hidden;
   }
   #cover.away{ transform:translateY(-100%); opacity:0; pointer-events:none; }
-  .envelope-wrap{ perspective:1400px; width:min(78vw,300px); }
+
+  /* Decoración ambiental: hojas doradas en las esquinas + destellos */
+  .cover-decor{ position:absolute; inset:0; z-index:0; pointer-events:none; }
+  .cover-decor svg{ position:absolute; opacity:.5; }
+  .cover-decor .leaf-tl{ top:-14px; left:-14px; width:150px; height:150px; }
+  .cover-decor .leaf-br{ bottom:-14px; right:-14px; width:150px; height:150px; transform:rotate(180deg); }
+  .cover-decor .spark{
+    position:absolute; width:4px; height:4px; border-radius:50%;
+    background:var(--gold-soft); opacity:.4; animation:twinkle 3.2s ease-in-out infinite;
+  }
+  .cover-decor .spark:nth-child(3){ top:18%; left:13%; animation-delay:.1s; }
+  .cover-decor .spark:nth-child(4){ top:74%; left:19%; animation-delay:1.2s; }
+  .cover-decor .spark:nth-child(5){ top:20%; right:15%; animation-delay:.7s; }
+  .cover-decor .spark:nth-child(6){ top:78%; right:11%; animation-delay:1.9s; }
+  @keyframes twinkle{ 0%,100%{opacity:.12; transform:scale(.6);} 50%{opacity:.8; transform:scale(1.15);} }
+
+  .cover-inner{ position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; }
+
+  .envelope-wrap{
+    perspective:1400px; width:min(78vw,300px); position:relative;
+    filter:drop-shadow(0 22px 34px rgba(0,0,0,.4));
+  }
+
+  /* Pequeño timbre postal decorativo en la esquina del sobre */
+  .stamp{
+    position:absolute; top:-16px; right:-14px; z-index:5;
+    width:56px; height:68px; transform:rotate(9deg);
+    background:linear-gradient(160deg,#faf4e2,#ecdfb9);
+    border:2px dotted rgba(198,166,103,.85);
+    border-radius:2px;
+    box-shadow:0 6px 12px rgba(0,0,0,.25);
+    display:flex; align-items:center; justify-content:center;
+    transition:opacity .35s ease, transform .35s ease;
+  }
+  .stamp svg{ width:28px; height:28px; stroke:var(--blush); stroke-width:1.3; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+
   .envelope{
     position:relative; width:100%; aspect-ratio:3/2;
     background:linear-gradient(160deg,#f5efdd,#e9dfc2);
     border-radius:6px; box-shadow:var(--shadow);
+    overflow:hidden;
   }
+  /* Textura sutil de papel */
+  .envelope::before{
+    content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
+    background-image:repeating-linear-gradient(115deg, rgba(0,0,0,.015) 0 2px, transparent 2px 5px);
+  }
+  /* Costura interior inferior en "V", como el pliegue trasero de un sobre real */
+  .envelope::after{
+    content:''; position:absolute; left:0; right:0; bottom:0; height:60%; z-index:1;
+    clip-path:polygon(0 100%, 50% 34%, 100% 100%);
+    background:linear-gradient(180deg, rgba(0,0,0,.035), rgba(0,0,0,0) 55%);
+    pointer-events:none;
+  }
+  /* Líneas finas de pliegue lateral */
+  .envelope-lines{ position:absolute; inset:0; z-index:1; pointer-events:none; }
+  .envelope-lines svg{ width:100%; height:100%; }
+
+  /* Listón/cordel que rodea el sobre y se anuda bajo el sello de cera */
+  .twine{
+    position:absolute; left:-6%; right:-6%; top:50%; height:14px; z-index:2;
+    transform:translateY(-50%); transition:opacity .35s ease;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,.14), transparent 30%, transparent 70%, rgba(0,0,0,.14)),
+      linear-gradient(90deg, var(--blush), var(--gold-soft) 45%, var(--blush) 55%, var(--gold-soft));
+    box-shadow:0 2px 5px rgba(0,0,0,.2);
+  }
+  .twine::before, .twine::after{
+    content:''; position:absolute; top:50%; width:9px; height:9px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff7e8, var(--gold) 65%, #9c7c3f 100%);
+    transform:translateY(-50%);
+  }
+  .twine::before{ left:43%; }
+  .twine::after{ left:53%; }
+
   .flap{
     position:absolute; top:0; left:0; width:100%; height:56%;
     background:linear-gradient(160deg,#f7f1e0,#e6dbbc);
@@ -136,26 +195,43 @@
     box-shadow:0 2px 6px rgba(0,0,0,.15);
     z-index:3;
   }
+  .flap::before{
+    content:''; position:absolute; inset:0;
+    background-image:repeating-linear-gradient(115deg, rgba(0,0,0,.02) 0 2px, transparent 2px 5px);
+    clip-path:inherit;
+  }
   #cover.opening .flap{ transform:rotateX(180deg); }
+
   .letter{
     position:absolute; left:8%; right:8%; bottom:6%; height:70%;
     background:var(--parchment); border-radius:3px; z-index:1;
     box-shadow:0 -4px 10px rgba(0,0,0,.08) inset;
     transition:transform .9s cubic-bezier(.2,.8,.2,1) .25s;
     display:flex; align-items:center; justify-content:center;
+    background-image:
+      linear-gradient(var(--parchment),var(--parchment)),
+      repeating-linear-gradient(rgba(198,166,103,.12) 0 1px, transparent 1px 26px);
   }
   #cover.opening .letter{ transform:translateY(-46%); }
   .letter span{ font-family:var(--script); font-size:30px; color:var(--gold); }
+
   .seal{
     position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
     width:64px; height:64px; border-radius:50%; z-index:4;
     background:radial-gradient(circle at 35% 30%, #d99a83, var(--blush) 60%, #a75f52 100%);
     display:flex; align-items:center; justify-content:center;
-    box-shadow:0 6px 14px rgba(0,0,0,.35);
+    box-shadow:0 6px 14px rgba(0,0,0,.35), inset 0 -4px 6px rgba(0,0,0,.2), inset 0 3px 5px rgba(255,255,255,.25);
     font-family:var(--script); color:#fbe9df; font-size:20px;
     transition:opacity .4s, transform .4s;
   }
+  .seal::after{
+    content:''; position:absolute; inset:3px; border-radius:50%;
+    border:1px dashed rgba(255,255,255,.35); pointer-events:none;
+  }
   #cover.opening .seal{ opacity:0; transform:translate(-50%,-50%) scale(.6); }
+  #cover.opening .twine{ opacity:0; }
+  #cover.opening .stamp{ opacity:0; transform:rotate(9deg) translateY(-10px); }
+
   .open-btn{ margin-top:40px; width:100%; text-align:center; }
   .cover-caption{
     margin-top:18px; color:var(--gold-soft); font-size:12px; letter-spacing:.18em; text-transform:uppercase; text-align:center; opacity:.85;
@@ -164,17 +240,17 @@
   /* ---------- Names panel ---------- */
   #names .bg{
     position:absolute; inset:0; z-index:0;
-    background-image:linear-gradient(180deg, rgba(18,32,26,.35), rgba(18,32,26,.85)), url('https://media-cldnry.s-nbcnews.com/image/upload/v1675808888/telemundocms/images/article/cover/2019/02/06/pareja-feliz.jpg');
+    background-image:linear-gradient(180deg, rgba(18,32,26,.35), rgba(18,32,26,.85)), url('images/TyJ.jpg');
     background-size:cover; background-position:center;
   }
   #names .content{
     position:relative; z-index:1; text-align:center; color:var(--parchment);
     flex:1; width:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;
   }
-  #names .eyebrow{color:var(--gold-soft);}
-  #names .script{ font-family:var(--script); font-size:clamp(46px,15vw,72px); color:var(--parchment); line-height:1; }
-  #names .amp{ font-family:var(--serif); font-style:italic; color:var(--gold); font-size:28px; display:block; margin:4px 0; }
-  #names .sub{ font-family:var(--serif); font-style:italic; font-size:17px; color:var(--gold-soft); margin-top:14px; }
+  #names .eyebrow{color:var(--gold-soft); font-size:14px; letter-spacing:.32em;}
+  #names .script{ font-family:var(--script); font-size:clamp(58px,19vw,92px); color:var(--parchment); line-height:1; }
+  #names .amp{ font-family:var(--serif); font-style:italic; color:var(--gold); font-size:34px; display:block; margin:4px 0; }
+  #names .sub{ font-family:var(--serif); font-style:italic; font-size:clamp(18px,4.6vw,22px); color:var(--gold-soft); margin-top:16px; max-width:300px; margin-left:auto; margin-right:auto; }
 
   /* ---------- Countdown ---------- */
   .countdown-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:22px; }
@@ -213,11 +289,12 @@
   .palette{ display:flex; justify-content:center; gap:10px; margin-top:18px; }
   .palette span{ width:26px; height:26px; border-radius:50%; border:1px solid var(--line); display:inline-block; }
 
-  /* ---------- QR ---------- */
-  .qr-box{ background:#fff; padding:14px; border-radius:10px; display:inline-block; margin-top:18px; box-shadow:var(--shadow); }
-  .qr-box img{ display:block; width:170px; height:170px; }
-
   /* ---------- Closing ---------- */
+  #closing .bg{
+    position:absolute; inset:0; z-index:0;
+    background-image:linear-gradient(180deg, rgba(18,32,26,.55), rgba(18,32,26,.82)), url('images/cierre.jpeg');
+    background-size:cover; background-position:center;
+  }
   #closing .content{
     position:relative; z-index:1; text-align:center;
     flex:1; width:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -293,10 +370,41 @@
 
 <!-- =============== PORTADA / SOBRE =============== -->
 <div id="cover">
-  <div>
+
+  <!-- Decoración ambiental: hojas doradas + destellos -->
+  <div class="cover-decor" aria-hidden="true">
+    <svg class="leaf-tl" viewBox="0 0 150 150" fill="none" stroke="var(--gold)" stroke-width="1.1">
+      <path d="M8 8c30 4 55 20 62 55M8 8c4 30 20 55 55 62M18 18c18 6 30 18 36 36" opacity=".7"/>
+      <circle cx="14" cy="14" r="2" fill="var(--gold)" stroke="none"/>
+    </svg>
+    <svg class="leaf-br" viewBox="0 0 150 150" fill="none" stroke="var(--gold)" stroke-width="1.1">
+      <path d="M8 8c30 4 55 20 62 55M8 8c4 30 20 55 55 62M18 18c18 6 30 18 36 36" opacity=".7"/>
+      <circle cx="14" cy="14" r="2" fill="var(--gold)" stroke="none"/>
+    </svg>
+    <span class="spark"></span><span class="spark"></span><span class="spark"></span><span class="spark"></span>
+  </div>
+
+  <div class="cover-inner">
     <div class="envelope-wrap">
+
+      <!-- Timbre postal decorativo -->
+      <div class="stamp" aria-hidden="true">
+        <svg viewBox="0 0 48 48"><path d="M24 40C10 30 6 22 6 15a9 9 0 0 1 18-1a9 9 0 0 1 18 1c0 7-4 15-18 25z"/></svg>
+      </div>
+
       <div class="envelope">
+        <!-- Líneas finas del pliegue lateral -->
+        <div class="envelope-lines" aria-hidden="true">
+          <svg viewBox="0 0 300 200" preserveAspectRatio="none">
+            <path d="M0 0 L150 112 L300 0" stroke="rgba(198,166,103,.35)" stroke-width="1" fill="none"/>
+          </svg>
+        </div>
+
         <div class="letter"><span>A &amp; J</span></div>
+
+        <!-- Listón que envuelve el sobre -->
+        <div class="twine" aria-hidden="true"></div>
+
         <div class="flap"></div>
         <button class="seal" id="openBtn" aria-label="Abrir invitación">A&amp;J</button>
       </div>
@@ -465,24 +573,7 @@
     </div>
   </section>
 
-  <!-- QR FOTOS -->
-  <section class="panel" id="qr">
-    <div class="panel-inner">
-      <div class="card">
-        <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M6 16h8l3-5h14l3 5h8v24H6z"/><circle cx="24" cy="28" r="8"/></svg></div>
-        <div class="eyebrow">Captura el momento</div>
-        <h2>Comparte tus Fotos</h2>
-        <div class="rule"></div>
-        <p>Escanea el código para subir las fotos y videos que tomes durante la boda. ¡Queremos ver la fiesta desde tu lente!</p>
-        <div class="qr-box">
-          <img id="qrImg" src="" alt="Código QR para subir fotos de la boda">
-        </div>
-        <div>
-          <a class="btn solid" id="btnUploadPhotos" href="#" target="_blank" rel="noopener" style="margin-top:18px;">Subir fotos</a>
-        </div>
-      </div>
-    </div>
-  </section>
+
 
   <!-- RSVP -->
   <section class="panel" id="rsvp">
@@ -500,6 +591,7 @@
 
   <!-- CIERRE -->
   <section class="panel" id="closing">
+    <div class="bg"></div>
     <div class="content">
       <div class="script">Antonio &amp; Jessica</div>
       <div class="seal-mini">A&amp;J</div>
@@ -640,14 +732,6 @@
    ========================================================= */
 const CONFIG = {
 
-  // --- Imagen o video de la banda de rosas (borde entre apartados) ---
-  // Coloca tu archivo en una carpeta "images" junto a este archivo,
-  // en tu repositorio de GitHub, y escribe aquí su ruta relativa.
-  // - Imagen estática: usa .jpg o .png (mínimo 1200px de ancho).
-  // - Video animado en loop: usa .mp4 o .webm (clip corto, 5-10 segundos,
-  //   sin audio, se detecta automático por la extensión del archivo).
-  roseBorderImage: "images/rose-border.jpg",
-
   // --- Ceremonia ---
   ceremony: {
     dateISO: "2026-12-05T17:00:00",
@@ -655,7 +739,10 @@ const CONFIG = {
     timeLabel: "5:00 PM",
     placeName: "Templo de Santa Rita de Casia",
     address: "Av Guadalupe 1668A, Chapalita Oriente, 45040 Zapopan, Jal.",
-    mapsQuery: "Av Guadalupe 1668A, Chapalita Oriente, 45040 Zapopan, Jal."
+    mapsQuery: "Av Guadalupe 1668A, Chapalita Oriente, 45040 Zapopan, Jal.",
+    // Coordenadas exactas del templo (más precisas que la dirección de
+    // texto, que a veces Google Maps geolocaliza al lugar vecino).
+    coords: { lat: 20.66614514230394, lng: -103.40650741112233 }
   },
 
   // --- Celebración / Recepción ---
@@ -665,17 +752,44 @@ const CONFIG = {
     timeLabel: "7:30 PM",
     placeName: "Goretti Eventos",
     address: "Periférico, C. López Cotilla 414, Tonalá, Jal.",
-    mapsQuery: "Periférico, C. López Cotilla 414, Tonalá, Jal."
+    mapsQuery: "Periférico, C. López Cotilla 414, Tonalá, Jal.",
+    // Si más adelante consigues las coordenadas exactas del salón,
+    // agrégalas igual que arriba: { lat: ..., lng: ... }
+    coords: null
   },
 
   rsvpDeadline: "15 de noviembre de 2026",
   bankAccount: "Cuenta XXXX XXXX XXXX XXXX",
   paypalEmail: "correopaypal@gmail.com",
-  photosUploadUrl: "https://photos.google.com/share/TU-ENLACE-AQUI", // álbum donde subirán fotos
   // Pega aquí tu endpoint de Formspree (https://formspree.io) para recibir
   // por correo las respuestas de "Sugerir Canción" y "Confirmar Asistencia".
   // Si lo dejas vacío, las respuestas solo se guardan en el navegador del invitado.
   formEndpoint: "",
+
+  // --- Google Forms (respuestas ILIMITADAS y gratis para siempre) ---
+  // Cada formulario de la invitación (Música y RSVP) envía sus datos a un
+  // Google Form "invisible" para el invitado —solo ve tu diseño bonito—
+  // y las respuestas caen automáticamente en una Hoja de Cálculo de Google.
+  // Ver instrucciones completas de cómo llenar esto en el chat con Claude.
+  googleForms: {
+    music: {
+      actionUrl: "https://docs.google.com/forms/d/e/1FAIpQLSetZHZMZ_X4N099Ix7wnRcv5qqtnxVCLrgzd9b2HH2BYY52Nw/formResponse",
+      entries: {
+        nombre: "entry.771778893",
+        cancion: "entry.496420703",
+        autor: "entry.1307870747",
+        youtube: "entry.552871000"
+      }
+    },
+    rsvp: {
+      actionUrl: "https://docs.google.com/forms/d/e/1FAIpQLSd6E2qDs8J2JQXpj2NrfAAY1w0ZWwNVCJCMdbu1zjoWNnwpdQ/formResponse",
+      entries: {
+        asiste: "entry.2117515757",
+        nombre: "entry.869397184",
+        nota: "entry.2142063063"
+      }
+    }
+  },
 
   // --- Foto de fondo de cada apartado ---
   // Cada apartado puede tener su propia foto de fondo (bodas, flores, etc.)
@@ -702,7 +816,6 @@ const CONFIG = {
     dresscode:   "images/backgrounds/dresscode.jpg",
     tips:        "images/backgrounds/tips.jpg",
     gifts:       "images/backgrounds/gifts.jpg",
-    qr:          "images/backgrounds/qr.jpg",
     // Ejemplo de cómo ajustar el recorte de una foto en particular:
     // rsvp: { src: "images/backgrounds/rsvp.jpg", position: "center top" },
     rsvp:        "images/backgrounds/rsvp.jpg"
@@ -728,18 +841,31 @@ $('#rsvp-deadline').textContent = CONFIG.rsvpDeadline;
 $('#bank-account').textContent = CONFIG.bankAccount;
 $('#bank-paypal').textContent = CONFIG.paypalEmail;
 
-const ceremonyMapsEmbed = 'https://www.google.com/maps?q=' + encodeURIComponent(CONFIG.ceremony.mapsQuery) + '&output=embed';
-const ceremonyMapsLink = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(CONFIG.ceremony.mapsQuery);
-$('#mapFrameCeremony').src = ceremonyMapsEmbed;
-$('#openMapsBtnCeremony').href = ceremonyMapsLink;
+// Arma las URLs de mapa: usa coordenadas exactas si están disponibles
+// (más precisas), y si no, cae de regreso a la dirección de texto.
+function buildMapsUrls(eventCfg){
+  if(eventCfg.coords && eventCfg.coords.lat && eventCfg.coords.lng){
+    const q = eventCfg.coords.lat + ',' + eventCfg.coords.lng;
+    return {
+      embed: 'https://www.google.com/maps?q=' + q + '&z=17&output=embed',
+      link: 'https://www.google.com/maps/search/?api=1&query=' + q
+    };
+  }
+  const q = encodeURIComponent(eventCfg.mapsQuery);
+  return {
+    embed: 'https://www.google.com/maps?q=' + q + '&output=embed',
+    link: 'https://www.google.com/maps/search/?api=1&query=' + q
+  };
+}
+const ceremonyMaps = buildMapsUrls(CONFIG.ceremony);
+$('#mapFrameCeremony').src = ceremonyMaps.embed;
+$('#openMapsBtnCeremony').href = ceremonyMaps.link;
 
-const celebrationMapsEmbed = 'https://www.google.com/maps?q=' + encodeURIComponent(CONFIG.celebration.mapsQuery) + '&output=embed';
-const celebrationMapsLink = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(CONFIG.celebration.mapsQuery);
-$('#mapFrameCelebration').src = celebrationMapsEmbed;
-$('#openMapsBtnCelebration').href = celebrationMapsLink;
+const celebrationMaps = buildMapsUrls(CONFIG.celebration);
+$('#mapFrameCelebration').src = celebrationMaps.embed;
+$('#openMapsBtnCelebration').href = celebrationMaps.link;
 
-$('#btnUploadPhotos').href = CONFIG.photosUploadUrl;
-$('#qrImg').src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(CONFIG.photosUploadUrl);
+
 
 /* ---------- Foto de fondo por apartado ----------
    Se pinta directamente como fondo del <section>, así que la tarjeta
@@ -759,48 +885,6 @@ Object.entries(CONFIG.sectionBackgrounds).forEach(([id, cfg]) => {
   panel.style.backgroundPosition = position;
   panel.style.backgroundRepeat = 'no-repeat';
 });
-
-/* ---------- Bandas de rosas entre apartados ----------
-   La portada (nombres) no lleva borde propio arriba ni abajo del todo;
-   el primer borde aparece justo AL SALIR de la portada, como límite
-   entre "Nos casamos" y "Cuenta regresiva". A partir de ahí, cada
-   apartado agrega solo su borde de ABAJO, que sirve a la vez como
-   borde superior del siguiente (así nunca se duplica). */
-function addRoseDivider(panelEl, position, overlay){
-  const div = document.createElement('div');
-  div.className = 'rose-divider rose-divider--' + position + (overlay ? ' overlay' : '');
-  if(position === 'top'){ panelEl.insertBefore(div, panelEl.firstChild); }
-  else{ panelEl.appendChild(div); }
-  return div;
-}
-const allPanels = $$('.panel');
-const roseDividerEls = [];
-allPanels.forEach((panel, i) => {
-  const overlay = panel.id === 'names' || panel.id === 'closing';
-  // Nota: ya NO se agrega borde arriba del primer apartado (la portada).
-  roseDividerEls.push(addRoseDivider(panel, 'bottom', overlay));
-});
-// Aplicar la banda configurada a todos los bordes.
-// Si CONFIG.roseBorderImage termina en .mp4 o .webm, se reproduce como
-// video en loop (silencioso y automático) para un efecto animado.
-// Si es una imagen normal (.jpg, .png, .gif...), se usa como fondo estático.
-const isVideoBorder = /\.(mp4|webm)$/i.test(CONFIG.roseBorderImage);
-if(isVideoBorder){
-  roseDividerEls.forEach(d => {
-    const vid = document.createElement('video');
-    vid.src = CONFIG.roseBorderImage;
-    vid.autoplay = true; vid.loop = true; vid.muted = true; vid.playsInline = true;
-    vid.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
-    vid.onerror = () => d.classList.add('no-image');
-    d.appendChild(vid);
-  });
-} else {
-  roseDividerEls.forEach(d => { d.style.backgroundImage = `url('${CONFIG.roseBorderImage}')`; });
-  // Si la imagen no existe todavía, se muestra un degradado dorado en su lugar
-  const roseCheck = new Image();
-  roseCheck.onerror = () => roseDividerEls.forEach(d => d.classList.add('no-image'));
-  roseCheck.src = CONFIG.roseBorderImage;
-}
 
 /* ---------- Envelope opening ---------- */
 const cover = $('#cover');
@@ -866,13 +950,34 @@ $('#btnTips').addEventListener('click', ()=> openModal('#modal-tips'));
 $('#btnGifts').addEventListener('click', ()=> openModal('#modal-gifts'));
 $('#btnRsvp').addEventListener('click', ()=> openModal('#modal-rsvp'));
 
-/* ---------- Envío de formularios (Música y RSVP) ---------- */
+/* ---------- Envío de formularios (Música y RSVP) ----------
+   Orden de intentos, todos ocurren siempre que estén configurados:
+   1) Se guarda una copia local en el navegador del invitado (respaldo).
+   2) Si CONFIG.googleForms.<tipo>.actionUrl está lleno, se manda ahí
+      (gratis e ilimitado para siempre — la opción recomendada).
+   3) Si además CONFIG.formEndpoint está lleno (Formspree), también se
+      manda ahí. Puedes usar solo uno de los dos, o ambos a la vez. */
+async function submitToGoogleForm(data, formCfg){
+  if(!formCfg || !formCfg.actionUrl) return;
+  const body = new URLSearchParams();
+  Object.entries(formCfg.entries || {}).forEach(([field, entryId]) => {
+    if(entryId && data[field] !== undefined) body.append(entryId, data[field]);
+  });
+  try{
+    // mode:'no-cors' es obligatorio para escribir en Google Forms desde
+    // otra página; el navegador no deja leer la respuesta, pero el envío
+    // sí llega — es el comportamiento esperado, no un error.
+    await fetch(formCfg.actionUrl, { method:'POST', mode:'no-cors', body });
+  }catch(err){ console.warn('No se pudo enviar a Google Forms', err); }
+}
+
 async function submitForm(data, type){
-  // Guarda una copia local por si no hay servicio conectado
   const key = type === 'music' ? 'songSuggestions' : 'rsvpResponses';
   const list = JSON.parse(localStorage.getItem(key) || '[]');
   list.push({ ...data, fecha: new Date().toISOString() });
   localStorage.setItem(key, JSON.stringify(list));
+
+  await submitToGoogleForm(data, CONFIG.googleForms[type]);
 
   if(CONFIG.formEndpoint){
     try{
