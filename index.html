@@ -98,144 +98,184 @@
   .scroll-hint svg{ animation:bob 1.8s ease-in-out infinite; }
   @keyframes bob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(6px);} }
 
-  /* ================================================================
-     ---------- Cover / Envelope (rediseñado y decorado) ----------
-     ================================================================ */
-  #cover{
-    position:fixed; inset:0; z-index:50;
-    display:flex; align-items:center; justify-content:center;
-    background:
-      radial-gradient(900px 600px at 50% 20%, #223b2c, transparent 60%),
-      var(--bg-deep);
-    transition:transform .9s cubic-bezier(.65,0,.35,1), opacity .9s ease;
-    overflow:hidden;
-  }
-  #cover.away{ transform:translateY(-100%); opacity:0; pointer-events:none; }
+/* ---------- Portada / Sobre Animado (CSS AJUSTADO PROPORCIONES) ---------- */
 
-  /* Decoración ambiental: hojas doradas en las esquinas + destellos */
-  .cover-decor{ position:absolute; inset:0; z-index:0; pointer-events:none; }
-  .cover-decor svg{ position:absolute; opacity:.5; }
-  .cover-decor .leaf-tl{ top:-14px; left:-14px; width:150px; height:150px; }
-  .cover-decor .leaf-br{ bottom:-14px; right:-14px; width:150px; height:150px; transform:rotate(180deg); }
-  .cover-decor .spark{
-    position:absolute; width:4px; height:4px; border-radius:50%;
-    background:var(--gold-soft); opacity:.4; animation:twinkle 3.2s ease-in-out infinite;
-  }
-  .cover-decor .spark:nth-child(3){ top:18%; left:13%; animation-delay:.1s; }
-  .cover-decor .spark:nth-child(4){ top:74%; left:19%; animation-delay:1.2s; }
-  .cover-decor .spark:nth-child(5){ top:20%; right:15%; animation-delay:.7s; }
-  .cover-decor .spark:nth-child(6){ top:78%; right:11%; animation-delay:1.9s; }
-  @keyframes twinkle{ 0%,100%{opacity:.12; transform:scale(.6);} 50%{opacity:.8; transform:scale(1.15);} }
+/* Contenedor principal de la portada */
+#cover {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Foto de fondo exclusiva de la portada. El degradado oscuro va
+     encima para que el sobre y los textos se sigan viendo con buen
+     contraste sin importar los tonos de la foto. Al abrir la
+     invitación, #cover.away se desvanece y desliza hacia arriba
+     (ver abajo), así que esta imagen desaparece junto con todo lo
+     demás automáticamente.
 
-  .cover-inner{ position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; }
+     --cover-bg-pos controla qué PARTE de la foto se prioriza al
+     recortarla para llenar la pantalla (background-size:cover SIEMPRE
+     ocupa toda la pantalla en cualquier dispositivo, pero no sabe qué
+     parte de tu foto es la importante). Si en el celular se ve muy
+     "acercada" o corta algo importante, cambia el valor dentro del
+     media query de abajo. Ejemplos:
+       "center"        -> centrado normal
+       "center top"    -> prioriza la parte de ARRIBA (rostros altos)
+       "center 30%"    -> prioriza un punto específico (0%=arriba, 100%=abajo) */
+  --cover-bg-pos: center;
+  background:
+    linear-gradient(180deg, rgba(18,32,26,.55), rgba(18,32,26,.82)),
+    url('images/fondo_portada.jpeg');
+  background-size: cover;
+  background-position: var(--cover-bg-pos);
+  background-repeat: no-repeat;
+  transition: transform 0.9s cubic-bezier(0.65,0,0.35,1), opacity 0.9s ease;
+}
 
-  .envelope-wrap{
-    perspective:1400px; width:min(78vw,300px); position:relative;
-    filter:drop-shadow(0 22px 34px rgba(0,0,0,.4));
-  }
+/* Pantallas angostas (la mayoría de celulares en vertical): al ser
+   mucho más altas que anchas, "cover" recorta bastante a los lados.
+   Ajusta este valor si necesitas mostrar más de la parte de arriba
+   o de abajo de tu foto en el celular. */
+@media (max-width: 480px){
+  #cover{ --cover-bg-pos: center 30%; }
+}
 
-  /* Pequeño timbre postal decorativo en la esquina del sobre */
-  .stamp{
-    position:absolute; top:-16px; right:-14px; z-index:5;
-    width:56px; height:68px; transform:rotate(9deg);
-    background:linear-gradient(160deg,#faf4e2,#ecdfb9);
-    border:2px dotted rgba(198,166,103,.85);
-    border-radius:2px;
-    box-shadow:0 6px 12px rgba(0,0,0,.25);
-    display:flex; align-items:center; justify-content:center;
-    transition:opacity .35s ease, transform .35s ease;
-  }
-  .stamp svg{ width:28px; height:28px; stroke:var(--blush); stroke-width:1.3; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+#cover.away {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
 
-  .envelope{
-    position:relative; width:100%; aspect-ratio:3/2;
-    background:linear-gradient(160deg,#f5efdd,#e9dfc2);
-    border-radius:6px; box-shadow:var(--shadow);
-    overflow:hidden;
-  }
-  /* Textura sutil de papel */
-  .envelope::before{
-    content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
-    background-image:repeating-linear-gradient(115deg, rgba(0,0,0,.015) 0 2px, transparent 2px 5px);
-  }
-  /* Costura interior inferior en "V", como el pliegue trasero de un sobre real */
-  .envelope::after{
-    content:''; position:absolute; left:0; right:0; bottom:0; height:60%; z-index:1;
-    clip-path:polygon(0 100%, 50% 34%, 100% 100%);
-    background:linear-gradient(180deg, rgba(0,0,0,.035), rgba(0,0,0,0) 55%);
-    pointer-events:none;
-  }
-  /* Líneas finas de pliegue lateral */
-  .envelope-lines{ position:absolute; inset:0; z-index:1; pointer-events:none; }
-  .envelope-lines svg{ width:100%; height:100%; }
+/* Envoltorio del sobre para controlar el tamaño en pantalla */
+.envelope-wrap {
+  width: min(85vw, 340px); /* Ancho general del sobre en pantalla */
+  position: relative;
+}
 
-  /* Listón/cordel que rodea el sobre y se anuda bajo el sello de cera */
-  .twine{
-    position:absolute; left:-6%; right:-6%; top:50%; height:14px; z-index:2;
-    transform:translateY(-50%); transition:opacity .35s ease;
-    background:
-      linear-gradient(180deg, rgba(0,0,0,.14), transparent 30%, transparent 70%, rgba(0,0,0,.14)),
-      linear-gradient(90deg, var(--blush), var(--gold-soft) 45%, var(--blush) 55%, var(--gold-soft));
-    box-shadow:0 2px 5px rgba(0,0,0,.2);
-  }
-  .twine::before, .twine::after{
-    content:''; position:absolute; top:50%; width:9px; height:9px; border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, #fff7e8, var(--gold) 65%, #9c7c3f 100%);
-    transform:translateY(-50%);
-  }
-  .twine::before{ left:43%; }
-  .twine::after{ left:53%; }
+/* Contenedor del sobre */
+.real-envelope {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3; /* Proporción (Ancho / Alto) de tu lienzo */
+  cursor: pointer;
+  overflow: visible; /* IMPORTANTE: Permite que la hoja suba sin cortar el borde superior */
 
-  .flap{
-    position:absolute; top:0; left:0; width:100%; height:56%;
-    background:linear-gradient(160deg,#f7f1e0,#e6dbbc);
-    clip-path:polygon(0 0,100% 0,50% 92%);
-    transform-origin:top center; transition:transform .8s cubic-bezier(.65,0,.35,1);
-    border-radius:6px 6px 0 0;
-    box-shadow:0 2px 6px rgba(0,0,0,.15);
-    z-index:3;
-  }
-  .flap::before{
-    content:''; position:absolute; inset:0;
-    background-image:repeating-linear-gradient(115deg, rgba(0,0,0,.02) 0 2px, transparent 2px 5px);
-    clip-path:inherit;
-  }
-  #cover.opening .flap{ transform:rotateX(180deg); }
+  /* ---------------------------------------------------------------
+     AJUSTES DE TAMAÑO ENTRE CAPAS
+     Cada PNG puede traer distinto margen transparente alrededor del
+     dibujo, así que aunque los contenedores midan igual, el dibujo se
+     ve de distinto tamaño. Sube o baja estos dos números (sin tocar
+     las imágenes) hasta lograr:
+       - "sobre-cuerpo.png" (el sobre abierto) del MISMO tamaño que
+         "sobre-cerrado.png".
+       - "sobre-hoja.png" (la tarjeta) MÁS CHICA, como si saliera de
+         adentro del sobre.
+     --------------------------------------------------------------- */
+  --body-scale: 1.18;  /* Agranda el sobre abierto. Sube a 1.25, 1.3... si aún se ve chico */
+  --sheet-scale: 1;    /* Escala extra de la hoja. Baja a .9, .85... si aún se ve muy grande */
+}
 
-  .letter{
-    position:absolute; left:8%; right:8%; bottom:6%; height:70%;
-    background:var(--parchment); border-radius:3px; z-index:1;
-    box-shadow:0 -4px 10px rgba(0,0,0,.08) inset;
-    transition:transform .9s cubic-bezier(.2,.8,.2,1) .25s;
-    display:flex; align-items:center; justify-content:center;
-    background-image:
-      linear-gradient(var(--parchment),var(--parchment)),
-      repeating-linear-gradient(rgba(198,166,103,.12) 0 1px, transparent 1px 26px);
-  }
-  #cover.opening .letter{ transform:translateY(-46%); }
-  .letter span{ font-family:var(--script); font-size:30px; color:var(--gold); }
+/* Estilos base comunes para imágenes posicionadas */
+.real-envelope img {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
 
-  .seal{
-    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    width:64px; height:64px; border-radius:50%; z-index:4;
-    background:radial-gradient(circle at 35% 30%, #d99a83, var(--blush) 60%, #a75f52 100%);
-    display:flex; align-items:center; justify-content:center;
-    box-shadow:0 6px 14px rgba(0,0,0,.35), inset 0 -4px 6px rgba(0,0,0,.2), inset 0 3px 5px rgba(255,255,255,.25);
-    font-family:var(--script); color:#fbe9df; font-size:20px;
-    transition:opacity .4s, transform .4s;
-  }
-  .seal::after{
-    content:''; position:absolute; inset:3px; border-radius:50%;
-    border:1px dashed rgba(255,255,255,.35); pointer-events:none;
-  }
-  #cover.opening .seal{ opacity:0; transform:translate(-50%,-50%) scale(.6); }
-  #cover.opening .twine{ opacity:0; }
-  #cover.opening .stamp{ opacity:0; transform:rotate(9deg) translateY(-10px); }
+/* ----------------------------------------------------
+   1 Y 2. SOBRE CERRADO Y SOBRE ABIERTO
+   Ambas capas parten del MISMO lienzo (100% x 100%). El sobre abierto
+   se escala desde el centro con --body-scale para igualar visualmente
+   el tamaño del sobre cerrado, sin desplazar su posición en pantalla.
+   ---------------------------------------------------- */
+.env-flap,
+.env-body {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform-origin: center center;
+}
 
-  .open-btn{ margin-top:40px; width:100%; text-align:center; }
-  .cover-caption{
-    margin-top:18px; color:var(--gold-soft); font-size:12px; letter-spacing:.18em; text-transform:uppercase; text-align:center; opacity:.85;
-  }
+/* 1. Sobre cerrado — es la referencia de tamaño, no se escala */
+.env-flap {
+  z-index: 3;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* 2. Sobre abierto (Base) */
+.env-body {
+  z-index: 1;
+  opacity: 0; /* Oculto inicialmente */
+  transform: scale(var(--body-scale));
+  transition: opacity 0.3s ease;
+}
+
+/* ----------------------------------------------------
+   3. HOJA / TARJETA (MÁS CHICA Y CENTRADA)
+   ---------------------------------------------------- */
+.env-sheet {
+  z-index: 2; /* Va entre el sobre abierto (1) y la solapa cerrada (3) */
+
+  /* Hacemos la hoja MÁS CHICA de ancho que el sobre */
+  width: 56%;  /* <-- Ajusta este valor si la quieres aún más chica o grande */
+  left: 22%;   /* <-- Centra la hoja automáticamente ( (100% - 56%) / 2 = 22% ) */
+
+  top: 20%;    /* Posición vertical dentro del sobre antes de abrir */
+  height: auto;
+  object-fit: contain; /* Preserva la imagen completa con sus bordes sin deformar ni recortar */
+  transform-origin: center center;
+
+  opacity: 0;  /* Oculta al inicio */
+  transform: scale(var(--sheet-scale));
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
+}
+
+
+/* ===================================================
+   ANIMACIÓN AL HACER CLIC (.opening)
+   =================================================== */
+
+/* Ocultar sobre cerrado */
+#cover.opening .env-flap {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Mostrar sobre abierto */
+#cover.opening .env-body {
+  opacity: 1;
+}
+
+/* Animar la hoja saliendo hacia arriba (conserva su escala) */
+#cover.opening .env-sheet {
+  opacity: 1;
+  transform: scale(var(--sheet-scale)) translateY(-55%); /* Eleva la tarjeta. Si quieres que suba más o menos, ajusta el -55% */
+}
+
+/* Botón y Caption */
+.open-btn {
+  margin-top: 30px;
+  width: 100%;
+  text-align: center;
+  z-index: 10;
+}
+
+.cover-caption {
+  margin-top: 14px;
+  color: var(--gold-soft);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-align: center;
+  opacity: 0.85;
+}
 
   /* ---------- Names panel ---------- */
   #names .bg{
@@ -286,9 +326,6 @@
   /* ---------- Dress code ---------- */
   .dress-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px; }
   .dress-grid img{ width:100%; height:200px; object-fit:cover; border-radius:8px; }
-  .palette{ display:flex; justify-content:center; gap:10px; margin-top:18px; }
-  .palette span{ width:26px; height:26px; border-radius:50%; border:1px solid var(--line); display:inline-block; }
-
   /* ---------- Closing ---------- */
   #closing .bg{
     position:absolute; inset:0; z-index:0;
@@ -368,49 +405,24 @@
 </head>
 <body class="not-opened">
 
-<!-- =============== PORTADA / SOBRE =============== -->
+<!-- =============== PORTADA / SOBRE ANIMADO =============== -->
 <div id="cover">
+  <div class="envelope-wrap">
+    <div class="real-envelope" id="openBtn">
+      
+      <!-- 1. BASE: El sobre abierto en el fondo -->
+      <img src="images/sobre-cuerpo.png" alt="Sobre" class="env-body">
 
-  <!-- Decoración ambiental: hojas doradas + destellos -->
-  <div class="cover-decor" aria-hidden="true">
-    <svg class="leaf-tl" viewBox="0 0 150 150" fill="none" stroke="var(--gold)" stroke-width="1.1">
-      <path d="M8 8c30 4 55 20 62 55M8 8c4 30 20 55 55 62M18 18c18 6 30 18 36 36" opacity=".7"/>
-      <circle cx="14" cy="14" r="2" fill="var(--gold)" stroke="none"/>
-    </svg>
-    <svg class="leaf-br" viewBox="0 0 150 150" fill="none" stroke="var(--gold)" stroke-width="1.1">
-      <path d="M8 8c30 4 55 20 62 55M8 8c4 30 20 55 55 62M18 18c18 6 30 18 36 36" opacity=".7"/>
-      <circle cx="14" cy="14" r="2" fill="var(--gold)" stroke="none"/>
-    </svg>
-    <span class="spark"></span><span class="spark"></span><span class="spark"></span><span class="spark"></span>
-  </div>
+      <!-- 2. MEDIO: La tarjeta que va dentro y se desliza hacia arriba -->
+      <img src="images/sobre-hoja.png" alt="Invitación" class="env-sheet">
 
-  <div class="cover-inner">
-    <div class="envelope-wrap">
-
-      <!-- Timbre postal decorativo -->
-      <div class="stamp" aria-hidden="true">
-        <svg viewBox="0 0 48 48"><path d="M24 40C10 30 6 22 6 15a9 9 0 0 1 18-1a9 9 0 0 1 18 1c0 7-4 15-18 25z"/></svg>
-      </div>
-
-      <div class="envelope">
-        <!-- Líneas finas del pliegue lateral -->
-        <div class="envelope-lines" aria-hidden="true">
-          <svg viewBox="0 0 300 200" preserveAspectRatio="none">
-            <path d="M0 0 L150 112 L300 0" stroke="rgba(198,166,103,.35)" stroke-width="1" fill="none"/>
-          </svg>
-        </div>
-
-        <div class="letter"><span>A &amp; J</span></div>
-
-        <!-- Listón que envuelve el sobre -->
-        <div class="twine" aria-hidden="true"></div>
-
-        <div class="flap"></div>
-        <button class="seal" id="openBtn" aria-label="Abrir invitación">A&amp;J</button>
-      </div>
+      <!-- 3. FRENTE: La solapa cerrada con el sello dorado -->
+      <img src="images/sobre-cerrado.png" alt="Solapa" class="env-flap">
+      
     </div>
+
     <div class="open-btn">
-      <button class="btn solid" id="openBtnText">Abrir</button>
+      <button class="btn solid" id="openBtnText">Abrir Invitación</button>
     </div>
     <div class="cover-caption">Tienes una invitación</div>
   </div>
@@ -498,10 +510,15 @@
         <h2>Galería</h2>
         <div class="rule"></div>
         <div class="carousel" id="carousel">
-          <img src="images/foto-1.jpg" alt="Foto de la pareja 1" loading="lazy">
-          <img src="images/foto-2.jpg" alt="Foto de la pareja 2" loading="lazy">
-          <img src="images/foto-3.jpg" alt="Foto de la pareja 3" loading="lazy">
-          <img src="images/foto-4.jpg" alt="Foto de la pareja 4" loading="lazy">
+          <img src="images/foto-1.jpeg" alt="Foto de la pareja 1" loading="lazy">
+          <img src="images/foto-2.jpeg" alt="Foto de la pareja 2" loading="lazy">
+          <img src="images/foto-3.jpeg" alt="Foto de la pareja 3" loading="lazy">
+          <img src="images/foto-4.jpeg" alt="Foto de la pareja 4" loading="lazy">
+          <img src="images/foto-5.jpeg" alt="Foto de la pareja 4" loading="lazy">
+          <img src="images/foto-6.jpeg" alt="Foto de la pareja 4" loading="lazy">
+          <img src="images/foto-7.jpeg" alt="Foto de la pareja 4" loading="lazy">
+          <img src="images/foto-8.jpeg" alt="Foto de la pareja 4" loading="lazy">
+          <img src="images/foto-9.jpeg" alt="Foto de la pareja 4" loading="lazy">
         </div>
         <div class="dots" id="carouselDots"></div>
       </div>
@@ -535,12 +552,7 @@
           <img src="images/dresscode-hombre.jpg" alt="Referencia de traje formal para hombre">
           <img src="images/dresscode-mujer.jpg" alt="Referencia de vestido formal para mujer">
         </div>
-        <div class="palette">
-          <span style="background:#12201a"></span>
-          <span style="background:#c6a667"></span>
-          <span style="background:#c98a7d"></span>
-          <span style="background:#f5efdd"></span>
-        </div>
+        <button class="btn" id="btnDressCode">Ver más</button>
       </div>
     </div>
   </section>
@@ -624,6 +636,19 @@
     <p id="modal-celebration-address">—</p>
     <iframe class="map-frame" id="mapFrameCelebration" src="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
     <a class="btn solid" id="openMapsBtnCelebration" href="#" target="_blank" rel="noopener" style="margin-top:18px; display:block; text-align:center;">Abrir en Google Maps</a>
+  </div>
+</div>
+
+<!-- Dress Code -->
+<div class="modal-overlay" id="modal-dresscode" data-modal>
+  <div class="modal">
+    <button class="modal-close" data-close>&times;</button>
+    <h3>Dress code</h3>
+    <div class="rule" style="margin-left:0"></div>
+    <p>Nuestra boda será elegante, pero no convencional.</p>
+    <p>Queremos que este día también refleje quiénes somos y que ustedes puedan hacer lo mismo. No buscamos imponer colores, estilos ni reglas estrictas: vengan elegantes, pero siendo ustedes mismos.</p>
+    <p>Usen aquello que los haga sentir cómodos, guapos y auténticos. Vestido, traje, conjunto, colores, estampados o ese detalle que los representa… queremos celebrar rodeados de nuestra familia y amigos tal como son.</p>
+    <p>La elegancia es la ocasión; el estilo lo ponen ustedes.🤍</p>
   </div>
 </div>
 
@@ -735,7 +760,7 @@ const CONFIG = {
   // --- Ceremonia ---
   ceremony: {
     dateISO: "2026-12-05T17:00:00",
-    dateLabel: "5 de diciembre",
+    dateLabel: "5 de diciembre de 2026",
     timeLabel: "5:00 PM",
     placeName: "Templo de Santa Rita de Casia",
     address: "Av Guadalupe 1668A, Chapalita Oriente, 45040 Zapopan, Jal.",
@@ -748,7 +773,7 @@ const CONFIG = {
   // --- Celebración / Recepción ---
   celebration: {
     dateISO: "2026-12-05T19:30:00",
-    dateLabel: "5 de diciembre",
+    dateLabel: "5 de diciembre de 2026",
     timeLabel: "7:30 PM",
     placeName: "Goretti Eventos",
     address: "Periférico, C. López Cotilla 414, Tonalá, Jal.",
@@ -808,7 +833,7 @@ const CONFIG = {
   //   "center bottom" -> prioriza la parte de ABAJO de la foto
   //   "center 30%"    -> prioriza un punto específico (0%=arriba, 100%=abajo)
   sectionBackgrounds: {
-    countdown:   "images/backgrounds/countdown.jpg",
+    countdown:   "images/backgrounds/countdown.jpeg",
     ceremony:    "images/backgrounds/ceremony.jpg",
     celebration: "images/backgrounds/celebration.jpg",
     gallery:     "images/backgrounds/gallery.jpg",
@@ -886,18 +911,31 @@ Object.entries(CONFIG.sectionBackgrounds).forEach(([id, cfg]) => {
   panel.style.backgroundRepeat = 'no-repeat';
 });
 
-/* ---------- Envelope opening ---------- */
-const cover = $('#cover');
-function openInvitation(){
+/* ---------- JavaScript Corregido ---------- */
+
+const cover = document.getElementById('cover');
+const openBtn = document.getElementById('openBtn'); 
+const openBtnText = document.getElementById('openBtnText'); 
+
+function openInvitation() {
+  if (!cover || cover.classList.contains('opening')) return;
+
+  // 1. Oculta sobre-cerrado, muestra sobre-cuerpo y eleva la sobre-hoja
   cover.classList.add('opening');
-  setTimeout(()=>{
+
+  // 2. Espera 3.5 segundos para apreciar la hoja fuera del sobre antes de deslizar la pantalla completa
+  setTimeout(() => {
     cover.classList.add('away');
-    document.body.classList.remove('not-opened');
-    document.body.classList.add('opened');
-  }, 850);
+    
+    if (document.body.classList.contains('not-opened')) {
+      document.body.classList.remove('not-opened');
+      document.body.classList.add('opened');
+    }
+  }, 1500); 
 }
-$('#openBtn').addEventListener('click', openInvitation);
-$('#openBtnText').addEventListener('click', openInvitation);
+
+if (openBtn) openBtn.addEventListener('click', openInvitation);
+if (openBtnText) openBtnText.addEventListener('click', openInvitation);
 
 /* ---------- Countdown (apunta a la Ceremonia) ---------- */
 function updateCountdown(){
@@ -945,6 +983,7 @@ $$('[data-modal]').forEach(overlay=>{
 });
 $('#btnLocationCeremony').addEventListener('click', ()=> openModal('#modal-location-ceremony'));
 $('#btnLocationCelebration').addEventListener('click', ()=> openModal('#modal-location-celebration'));
+$('#btnDressCode').addEventListener('click', ()=> openModal('#modal-dresscode'));
 $('#btnMusic').addEventListener('click', ()=> openModal('#modal-music'));
 $('#btnTips').addEventListener('click', ()=> openModal('#modal-tips'));
 $('#btnGifts').addEventListener('click', ()=> openModal('#modal-gifts'));
