@@ -42,7 +42,6 @@
   a{color:inherit;}
   ::selection{background:var(--gold-soft); color:var(--ink);}
 
-  /* ---------- Scroll container ---------- */
   #scrollContainer{
     height:100dvh; width:100%;
     overflow-y:auto; overflow-x:hidden;
@@ -84,8 +83,13 @@
   .card-front{ position:relative; }
   .card-back{
     position:absolute; inset:0; transform:rotateY(180deg);
-    overflow-y:auto; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
   }
+  .card-badge{
+    position:absolute; top:-30px; left:50%; transform:translateX(-50%);
+    width:66px; height:66px; z-index:6; pointer-events:none;
+  }
+  .card-badge img{ width:100%; height:100%; object-fit:contain; display:block; }
   .card-flip-hint{
     margin-top:18px; font-size:10px; letter-spacing:.14em; text-transform:uppercase;
     color:var(--ink-soft); opacity:.55; display:flex; align-items:center; justify-content:center; gap:6px;
@@ -118,9 +122,6 @@
   .scroll-hint svg{ animation:bob 1.8s ease-in-out infinite; }
   @keyframes bob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(6px);} }
 
-/* ---------- Portada / Sobre Animado (CSS AJUSTADO PROPORCIONES) ---------- */
-
-/* Contenedor principal de la portada */
 #cover {
   position: fixed;
   inset: 0;
@@ -238,7 +239,6 @@
   opacity: 0.85;
 }
 
-  /* ---------- Names panel ---------- */
   #names .bg{
     position:absolute; inset:0; z-index:0;
     background-image:linear-gradient(180deg, rgba(18,32,26,.35), rgba(18,32,26,.85)), url('images/TyJ.jpg');
@@ -253,26 +253,21 @@
   #names .amp{ font-family:var(--serif); font-style:italic; color:var(--gold); font-size:34px; display:block; margin:4px 0; }
   #names .sub{ font-family:var(--serif); font-style:italic; font-size:clamp(18px,4.6vw,22px); color:var(--gold-soft); margin-top:16px; max-width:300px; margin-left:auto; margin-right:auto; }
 
-  /* ---------- Countdown ---------- */
-  .countdown-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:22px; }
+  .countdown-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:22px; width:100%; }
   .cd-box{ background:var(--bg-deep); border:1px solid var(--line); border-radius:var(--r); padding:14px 4px; }
   .cd-box .num{ font-family:var(--serif); font-size:28px; color:var(--gold-soft); }
   .cd-box .lab{ font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--parchment); opacity:.7; margin-top:4px; }
 
-  /* ---------- Icono de línea (estilo Canva) para cada tarjeta ---------- */
   .card-icon{ display:flex; align-items:center; justify-content:center; margin-bottom:8px; }
   .card-icon svg{ width:44px; height:44px; stroke:var(--gold); stroke-width:1.3; fill:none; stroke-linecap:round; stroke-linejoin:round; }
 
-  /* ---------- Ceremonia / Celebración ---------- */
-  .schedule{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px; }
+  .schedule{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px; width:100%; }
   .schedule-item{ background:var(--bg-deep); border:1px solid var(--line); border-radius:var(--r); padding:12px 6px; }
   .schedule-item .lab{ font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold-soft); opacity:.85; }
   .schedule-item .val{ font-family:var(--serif); font-size:20px; color:var(--parchment); margin-top:3px; display:block; }
 
-  /* ---------- Map modal preview ---------- */
   .map-frame{ width:100%; height:220px; border:0; border-radius:var(--r); margin-top:18px; filter:sepia(.15) saturate(1.1); }
 
-  /* ---------- Carousel ---------- */
   #gallery .card-face{ max-width:460px; padding:34px 0; }
   .carousel{ display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory; padding:0 24px 6px; -webkit-overflow-scrolling:touch; }
   .carousel::-webkit-scrollbar{ display:none; }
@@ -284,13 +279,11 @@
   .dots span{ width:6px; height:6px; border-radius:50%; background:var(--line); transition:.2s; }
   .dots span.active{ background:var(--gold); width:16px; border-radius:4px; }
 
-  /* ---------- Dress code ---------- */
   .dress-single{ display:flex; justify-content:center; margin-top:20px; }
   .dress-single img{
     width:100%; max-width:280px; height:auto; object-fit:contain;
     border-radius:8px; box-shadow:0 14px 30px rgba(0,0,0,.2); display:block;
   }
-  /* ---------- Closing ---------- */
   #closing .bg{
     position:absolute; inset:0; z-index:0;
     background-image:linear-gradient(180deg, rgba(18,32,26,.55), rgba(18,32,26,.82)), url('images/cierre.jpeg');
@@ -308,7 +301,6 @@
   }
   #closing p{ color:var(--parchment); opacity:.75; font-size:13px; margin-top:16px; letter-spacing:.06em; }
 
-  /* ---------- Modals ---------- */
   .modal-overlay{
     position:fixed; inset:0; z-index:100; display:flex; align-items:flex-end; justify-content:center;
     background:rgba(10,16,12,.55); opacity:0; pointer-events:none; transition:opacity .3s;
@@ -369,7 +361,6 @@
 </head>
 <body class="not-opened">
 
-<!-- =============== PORTADA / SOBRE ANIMADO =============== -->
 <div id="cover">
   <div class="envelope-wrap">
     <div class="real-envelope" id="openBtn">
@@ -385,10 +376,8 @@
   </div>
 </div>
 
-<!-- =============== CONTENIDO =============== -->
 <div id="scrollContainer">
 
-  <!-- NOMBRES -->
   <section class="panel" id="names">
     <div class="bg"></div>
     <div class="content">
@@ -404,7 +393,6 @@
     </div>
   </section>
 
-  <!-- CUENTA REGRESIVA -->
   <section class="panel" id="countdown">
     <div class="panel-inner">
       <div class="card" data-flip>
@@ -440,7 +428,6 @@
     </div>
   </section>
 
-  <!-- CEREMONIA -->
   <section class="panel" id="ceremony">
     <div class="panel-inner">
       <div class="card" data-flip>
@@ -464,7 +451,7 @@
             <h2>Ceremony</h2>
             <div class="rule"></div>
             <div class="schedule">
-              <div class="schedule-item"><span class="lab">Date</span><span class="val js-ceremony-date">—</span></div>
+              <div class="schedule-item"><span class="lab">Date</span><span class="val js-ceremony-date-en">—</span></div>
               <div class="schedule-item"><span class="lab">Time</span><span class="val js-ceremony-time">—</span></div>
             </div>
             <p class="js-ceremony-place" style="margin-top:16px;">—</p>
@@ -476,7 +463,6 @@
     </div>
   </section>
 
-  <!-- CELEBRACIÓN -->
   <section class="panel" id="celebration">
     <div class="panel-inner">
       <div class="card" data-flip>
@@ -500,7 +486,7 @@
             <h2>Reception</h2>
             <div class="rule"></div>
             <div class="schedule">
-              <div class="schedule-item"><span class="lab">Date</span><span class="val js-celebration-date">—</span></div>
+              <div class="schedule-item"><span class="lab">Date</span><span class="val js-celebration-date-en">—</span></div>
               <div class="schedule-item"><span class="lab">Time</span><span class="val js-celebration-time">—</span></div>
             </div>
             <p class="js-celebration-place" style="margin-top:16px;">—</p>
@@ -512,7 +498,6 @@
     </div>
   </section>
 
-  <!-- GALERÍA -->
   <section class="panel" id="gallery">
     <div class="panel-inner">
       <div class="card" data-flip>
@@ -533,6 +518,7 @@
               <img src="images/foto-8.jpeg" alt="Foto de la pareja 8" loading="lazy">
               <img src="images/foto-9.jpeg" alt="Foto de la pareja 9" loading="lazy">
               <img src="images/foto-10.jpg" alt="Foto de la pareja 10" loading="lazy">
+              <img src="images/foto-11.jpeg" alt="Foto de la pareja 11" loading="lazy">
             </div>
             <div class="dots" id="carouselDots"></div>
             <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Toca fuera de las fotos para ver en inglés</div>
@@ -550,7 +536,6 @@
     </div>
   </section>
 
-  <!-- MÚSICA -->
   <section class="panel" id="music">
     <div class="panel-inner">
       <div class="card" data-flip>
@@ -578,7 +563,6 @@
     </div>
   </section>
 
-  <!-- DRESS CODE -->
   <section class="panel" id="dresscode">
     <div class="panel-inner">
       <div class="card" data-flip>
@@ -612,7 +596,6 @@
     </div>
   </section>
 
-  <!-- TIPS Y NOTAS -->
   <section class="panel" id="tips">
     <div class="panel-inner">
       <div class="card" data-flip>
@@ -640,7 +623,6 @@
     </div>
   </section>
 
-  <!-- REGALOS -->
   <section class="panel" id="gifts">
     <div class="panel-inner">
       <div class="card" data-flip>
@@ -670,7 +652,6 @@
 
 
 
-  <!-- RSVP -->
   <section class="panel" id="rsvp">
     <div class="panel-inner">
       <div class="card" data-flip>
@@ -689,7 +670,7 @@
             <div class="eyebrow">Last confirmation</div>
             <h2>RSVP</h2>
             <div class="rule"></div>
-            <p>Will you join us on this special day? Please confirm before <span class="js-rsvp-deadline">—</span>.</p>
+            <p>Will you join us on this special day? Please confirm before <span class="js-rsvp-deadline-en">—</span>.</p>
             <button class="btn solid" id="btnRsvpEn">Confirm attendance</button>
             <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Tap to see in Spanish</div>
           </div>
@@ -698,21 +679,17 @@
     </div>
   </section>
 
-  <!-- CIERRE -->
   <section class="panel" id="closing">
     <div class="bg"></div>
     <div class="content">
       <div class="script">Antonio &amp; Jessica</div>
-      <div class="seal-mini">A&amp;J</div>
+      <img src="images/boton.png" alt="Antonio & Jessica" class="seal-mini">
       <p>Gracias por ser parte de nuestra historia</p>
     </div>
   </section>
 
 </div>
 
-<!-- =============== MODALES =============== -->
-
-<!-- Ubicación Ceremonia -->
 <div class="modal-overlay" id="modal-location-ceremony" data-modal>
   <div class="modal">
     <button class="modal-close" data-close>&times;</button>
@@ -724,7 +701,6 @@
   </div>
 </div>
 
-<!-- Ubicación Celebración -->
 <div class="modal-overlay" id="modal-location-celebration" data-modal>
   <div class="modal">
     <button class="modal-close" data-close>&times;</button>
@@ -736,7 +712,6 @@
   </div>
 </div>
 
-<!-- Dress Code -->
 <div class="modal-overlay" id="modal-dresscode" data-modal>
   <div class="modal">
     <button class="modal-close" data-close>&times;</button>
@@ -749,7 +724,6 @@
   </div>
 </div>
 
-<!-- Música -->
 <div class="modal-overlay" id="modal-music" data-modal>
   <div class="modal">
     <button class="modal-close" data-close>&times;</button>
@@ -781,7 +755,6 @@
   </div>
 </div>
 
-<!-- Tips -->
 <div class="modal-overlay" id="modal-tips" data-modal>
   <div class="modal">
     <button class="modal-close" data-close>&times;</button>
@@ -797,7 +770,6 @@
   </div>
 </div>
 
-<!-- Regalos -->
 <div class="modal-overlay" id="modal-gifts" data-modal>
   <div class="modal">
     <button class="modal-close" data-close>&times;</button>
@@ -805,15 +777,14 @@
     <div class="rule" style="margin-left:0"></div>
     <p>Para quienes deseen hacer un regalo en efectivo, contaremos con sobres disponibles para depositar en el cofre. También pueden contribuir mediante:</p>
     <div class="bank-box">
-      <div class="k">Depósito bancario</div>
-      <div class="v"><span id="bank-account">Cuenta XXXX XXXX XXXX XXXX</span><button class="copy-btn" data-copy="bank-account">Copiar</button></div>
+      <div class="k">Depósito bancario CLABE BBVA</div>
+      <div class="v"><span id="bank-account">012320015670350209</span><button class="copy-btn" data-copy="bank-account">Copiar</button></div>
       <div class="k">PayPal</div>
-      <div class="v"><span id="bank-paypal">correopaypal@gmail.com</span><button class="copy-btn" data-copy="bank-paypal">Copiar</button></div>
+      <div class="v"><span id="bank-paypal">https://paypal.me/nuestraBodaJYT</span><button class="copy-btn" data-copy="bank-paypal">Copiar</button></div>
     </div>
   </div>
 </div>
 
-<!-- RSVP -->
 <div class="modal-overlay" id="modal-rsvp" data-modal>
   <div class="modal">
     <button class="modal-close" data-close>&times;</button>
@@ -848,16 +819,142 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="modal-location-ceremony-en" data-modal>
+  <div class="modal">
+    <button class="modal-close" data-close>&times;</button>
+    <h3>How to get there? — Ceremony</h3>
+    <div class="rule" style="margin-left:0"></div>
+    <p id="modal-ceremony-address-en">—</p>
+    <iframe class="map-frame" id="mapFrameCeremonyEn" src="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <a class="btn solid" id="openMapsBtnCeremonyEn" href="#" target="_blank" rel="noopener" style="margin-top:18px; display:block; text-align:center;">Open in Google Maps</a>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-location-celebration-en" data-modal>
+  <div class="modal">
+    <button class="modal-close" data-close>&times;</button>
+    <h3>How to get there? — Reception</h3>
+    <div class="rule" style="margin-left:0"></div>
+    <p id="modal-celebration-address-en">—</p>
+    <iframe class="map-frame" id="mapFrameCelebrationEn" src="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <a class="btn solid" id="openMapsBtnCelebrationEn" href="#" target="_blank" rel="noopener" style="margin-top:18px; display:block; text-align:center;">Open in Google Maps</a>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-dresscode-en" data-modal>
+  <div class="modal">
+    <button class="modal-close" data-close>&times;</button>
+    <h3>Dress code</h3>
+    <div class="rule" style="margin-left:0"></div>
+    <p>Our wedding will be elegant, but not conventional.</p>
+    <p>We want this day to also reflect who we are, and for you to be able to do the same. We're not looking to impose colors, styles, or strict rules: come elegant, but be yourselves.</p>
+    <p>Wear whatever makes you feel comfortable, handsome, and authentic. Dress, suit, outfit, colors, patterns, or that detail that represents you… we want to celebrate surrounded by our family and friends just as they are.</p>
+    <p>Elegance is the occasion; the style is yours to choose. 🤍</p>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-music-en" data-modal>
+  <div class="modal">
+    <button class="modal-close" data-close>&times;</button>
+    <h3>Suggest a Song</h3>
+    <div class="rule" style="margin-left:0"></div>
+    <form id="formMusicEn">
+      <div class="field">
+        <label for="m-name-en">Full name</label>
+        <input id="m-name-en" name="nombre" type="text" required placeholder="Your name">
+      </div>
+      <div class="field">
+        <label for="m-song-en">Song title</label>
+        <input id="m-song-en" name="cancion" type="text" required placeholder="E.g. Perfect">
+      </div>
+      <div class="field">
+        <label for="m-artist-en">Artist</label>
+        <input id="m-artist-en" name="autor" type="text" required placeholder="E.g. Ed Sheeran">
+      </div>
+      <div class="field">
+        <label for="m-yt-en">YouTube link (optional)</label>
+        <input id="m-yt-en" name="youtube" type="url" placeholder="https://youtube.com/...">
+      </div>
+      <button class="btn solid" type="submit" style="width:100%; margin-top:22px;">Save Song</button>
+    </form>
+    <div class="thanks" id="thanksMusicEn">
+      <div class="mark">Thank you!</div>
+      <p>Your song is already on the party list 🎶</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-tips-en" data-modal>
+  <div class="modal">
+    <button class="modal-close" data-close>&times;</button>
+    <h3>Tips & Notes</h3>
+    <div class="rule" style="margin-left:0"></div>
+    <ul class="note-list">
+      <li>Please be on time!</li>
+      <li>We want you to enjoy this party to the fullest, so we've decided to make it an adults-only event.</li>
+      <li>Please confirm your attendance as soon as possible, before the date shown!</li>
+      <li>Bring a jacket to enjoy the outdoor spaces.</li>
+      <li>Forget about everything else and enjoy!!!</li>
+    </ul>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-gifts-en" data-modal>
+  <div class="modal">
+    <button class="modal-close" data-close>&times;</button>
+    <h3>Gift Registry</h3>
+    <div class="rule" style="margin-left:0"></div>
+    <p>For those who'd like to give a cash gift, we'll have envelopes available to place in the chest. You can also contribute through:</p>
+    <div class="bank-box">
+      <div class="k">Bank deposit BBVA</div>
+      <div class="v"><span id="bank-account-en">012320015670350209</span><button class="copy-btn" data-copy="bank-account-en">Copy</button></div>
+      <div class="k">PayPal</div>
+      <div class="v"><span id="bank-paypal-en">https://paypal.me/nuestraBodaJYT</span><button class="copy-btn" data-copy="bank-paypal-en">Copy</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-rsvp-en" data-modal>
+  <div class="modal">
+    <button class="modal-close" data-close>&times;</button>
+    <h3>Confirm Attendance</h3>
+    <div class="rule" style="margin-left:0"></div>
+    <form id="formRsvpEn">
+      <p style="text-align:left; font-weight:500; color:var(--ink);">Will you be attending the celebration?</p>
+      <div class="radio-group">
+        <label class="radio-pill">
+          <input type="radio" name="asiste" value="si" required>
+          <span>Yes, I'll be there!</span>
+        </label>
+        <label class="radio-pill">
+          <input type="radio" name="asiste" value="no">
+          <span>Can't make it</span>
+        </label>
+      </div>
+      <div class="field">
+        <label for="r-name-en">Full name</label>
+        <input id="r-name-en" name="nombre" type="text" required placeholder="Your name">
+      </div>
+      <div class="field">
+        <label for="r-note-en">Anything we should know? (optional)</label>
+        <textarea id="r-note-en" name="nota" rows="3" placeholder="E.g. I'm vegetarian"></textarea>
+      </div>
+      <button class="btn solid" type="submit" style="width:100%; margin-top:22px;">Send RSVP</button>
+    </form>
+    <div class="thanks" id="thanksRsvpEn">
+      <div class="mark">Thank you!</div>
+      <p>Your response has been recorded. See you soon!</p>
+    </div>
+  </div>
+</div>
+
 <script>
-/* =========================================================
-   CONFIGURACIÓN — edita solo esta sección con tus datos
-   ========================================================= */
 const CONFIG = {
 
-  // --- Ceremonia ---
   ceremony: {
     dateISO: "2026-12-05T17:00:00",
     dateLabel: "5 de diciembre de 2026",
+    dateLabelEn: "December 5, 2026",
     timeLabel: "5:00 PM",
     placeName: "Templo de Santa Rita de Casia",
     address: "Av Guadalupe 1668A, Chapalita Oriente, 45040 Zapopan, Jal.",
@@ -865,10 +962,10 @@ const CONFIG = {
     coords: { lat: 20.66614514230394, lng: -103.40650741112233 }
   },
 
-  // --- Celebración / Recepción ---
   celebration: {
     dateISO: "2026-12-05T19:30:00",
     dateLabel: "5 de diciembre de 2026",
+    dateLabelEn: "December 5, 2026",
     timeLabel: "7:30 PM",
     placeName: "Goretti Eventos",
     address: "Periférico, C. López Cotilla 414, Tonalá, Jal.",
@@ -877,8 +974,9 @@ const CONFIG = {
   },
 
   rsvpDeadline: "15 de noviembre de 2026",
-  bankAccount: "Cuenta XXXX XXXX XXXX XXXX",
-  paypalEmail: "correopaypal@gmail.com",
+  rsvpDeadlineEn: "November 15, 2026",
+  bankAccount: "012320015670350209",
+  paypalEmail: "https://paypal.me/nuestraBodaJYT",
   formEndpoint: "",
 
   googleForms: {
@@ -901,11 +999,6 @@ const CONFIG = {
     }
   },
 
-  // --- Foto de fondo de cada apartado ---
-  // Todos apuntan a la misma imagen "countdown.jpg" (según lo pedido),
-  // menos el cierre, que sigue usando su propia foto (images/cierre.jpeg,
-  // ver más abajo en el CSS de #closing .bg — ese no forma parte de este
-  // listado porque no es un apartado con .card, es la pantalla final).
   sectionBackgrounds: {
     countdown:   "images/backgrounds/countdown.jpg",
     ceremony:    "images/backgrounds/countdown.jpg",
@@ -919,27 +1012,30 @@ const CONFIG = {
   }
 };
 
-/* ---------- Utilidades ---------- */
 const $ = (sel, ctx=document) => ctx.querySelector(sel);
 const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
 
-/* ---------- Rellenar Ceremonia / Celebración (frente Y dorso a la vez) ---------- */
 $$('.js-ceremony-date').forEach(el => el.textContent = CONFIG.ceremony.dateLabel);
+$$('.js-ceremony-date-en').forEach(el => el.textContent = CONFIG.ceremony.dateLabelEn);
 $$('.js-ceremony-time').forEach(el => el.textContent = CONFIG.ceremony.timeLabel);
 $$('.js-ceremony-place').forEach(el => el.textContent = CONFIG.ceremony.placeName + ' — ' + CONFIG.ceremony.address);
 $('#modal-ceremony-address').textContent = CONFIG.ceremony.placeName + ', ' + CONFIG.ceremony.address;
+$('#modal-ceremony-address-en').textContent = CONFIG.ceremony.placeName + ', ' + CONFIG.ceremony.address;
 
 $$('.js-celebration-date').forEach(el => el.textContent = CONFIG.celebration.dateLabel);
+$$('.js-celebration-date-en').forEach(el => el.textContent = CONFIG.celebration.dateLabelEn);
 $$('.js-celebration-time').forEach(el => el.textContent = CONFIG.celebration.timeLabel);
 $$('.js-celebration-place').forEach(el => el.textContent = CONFIG.celebration.placeName + ' — ' + CONFIG.celebration.address);
 $('#modal-celebration-address').textContent = CONFIG.celebration.placeName + ', ' + CONFIG.celebration.address;
+$('#modal-celebration-address-en').textContent = CONFIG.celebration.placeName + ', ' + CONFIG.celebration.address;
 
 $$('.js-rsvp-deadline').forEach(el => el.textContent = CONFIG.rsvpDeadline);
+$$('.js-rsvp-deadline-en').forEach(el => el.textContent = CONFIG.rsvpDeadlineEn);
 $('#bank-account').textContent = CONFIG.bankAccount;
 $('#bank-paypal').textContent = CONFIG.paypalEmail;
+$('#bank-account-en').textContent = CONFIG.bankAccount;
+$('#bank-paypal-en').textContent = CONFIG.paypalEmail;
 
-// Arma las URLs de mapa: usa coordenadas exactas si están disponibles
-// (más precisas), y si no, cae de regreso a la dirección de texto.
 function buildMapsUrls(eventCfg){
   if(eventCfg.coords && eventCfg.coords.lat && eventCfg.coords.lng){
     const q = eventCfg.coords.lat + ',' + eventCfg.coords.lng;
@@ -957,12 +1053,15 @@ function buildMapsUrls(eventCfg){
 const ceremonyMaps = buildMapsUrls(CONFIG.ceremony);
 $('#mapFrameCeremony').src = ceremonyMaps.embed;
 $('#openMapsBtnCeremony').href = ceremonyMaps.link;
+$('#mapFrameCeremonyEn').src = ceremonyMaps.embed;
+$('#openMapsBtnCeremonyEn').href = ceremonyMaps.link;
 
 const celebrationMaps = buildMapsUrls(CONFIG.celebration);
 $('#mapFrameCelebration').src = celebrationMaps.embed;
 $('#openMapsBtnCelebration').href = celebrationMaps.link;
+$('#mapFrameCelebrationEn').src = celebrationMaps.embed;
+$('#openMapsBtnCelebrationEn').href = celebrationMaps.link;
 
-/* ---------- Foto de fondo por apartado ---------- */
 Object.entries(CONFIG.sectionBackgrounds).forEach(([id, cfg]) => {
   const panel = document.getElementById(id);
   if(!panel || !cfg) return;
@@ -976,7 +1075,13 @@ Object.entries(CONFIG.sectionBackgrounds).forEach(([id, cfg]) => {
   panel.style.backgroundRepeat = 'no-repeat';
 });
 
-/* ---------- JavaScript del sobre ---------- */
+document.querySelectorAll('.card-face').forEach(face => {
+  const badge = document.createElement('div');
+  badge.className = 'card-badge';
+  badge.innerHTML = '<img src="images/boton.png" alt="">';
+  face.insertBefore(badge, face.firstChild);
+});
+
 const cover = document.getElementById('cover');
 const openBtn = document.getElementById('openBtn');
 const openBtnText = document.getElementById('openBtnText');
@@ -995,7 +1100,6 @@ function openInvitation() {
 if (openBtn) openBtn.addEventListener('click', openInvitation);
 if (openBtnText) openBtnText.addEventListener('click', openInvitation);
 
-/* ---------- Countdown (apunta a la Ceremonia, actualiza AMBAS caras) ---------- */
 function updateCountdown(){
   const target = new Date(CONFIG.ceremony.dateISO).getTime();
   const now = Date.now();
@@ -1012,7 +1116,6 @@ function updateCountdown(){
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
-/* ---------- Carousel dots ---------- */
 const carousel = $('#carousel');
 const dotsWrap = $('#carouselDots');
 const slides = $$('img', carousel);
@@ -1026,12 +1129,6 @@ carousel.addEventListener('scroll', () => {
   $$('span', dotsWrap).forEach((d,i)=> d.classList.toggle('active', i===idx));
 }, { passive:true });
 
-/* ---------- Volteo de tarjetas (ES / EN) ----------
-   Al presionar en cualquier parte "vacía" de una tarjeta, se voltea
-   para mostrar el mismo contenido en inglés. Si el toque fue sobre un
-   botón, enlace, campo de formulario o dentro del carrusel de fotos,
-   NO se voltea la tarjeta — para que esos elementos sigan funcionando
-   con normalidad (abrir modales, hacer scroll a las fotos, etc). */
 $$('.card[data-flip]').forEach(card => {
   const inner = $('.card-inner', card);
   inner.addEventListener('click', (e) => {
@@ -1040,7 +1137,6 @@ $$('.card[data-flip]').forEach(card => {
   });
 });
 
-/* ---------- Modales genéricos ---------- */
 function openModal(id){
   $(id).classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -1053,24 +1149,22 @@ $$('[data-modal]').forEach(overlay=>{
   overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(overlay); });
   $('[data-close]', overlay).addEventListener('click', ()=> closeModal(overlay));
 });
-// Los botones del dorso (id...En) abren el MISMO modal que su versión en
-// español — el modal en sí no está traducido, solo la tarjeta.
-$('#btnLocationCeremony').addEventListener('click', ()=> openModal('#modal-location-ceremony'));
-$('#btnLocationCeremonyEn').addEventListener('click', ()=> openModal('#modal-location-ceremony'));
-$('#btnLocationCelebration').addEventListener('click', ()=> openModal('#modal-location-celebration'));
-$('#btnLocationCelebrationEn').addEventListener('click', ()=> openModal('#modal-location-celebration'));
-$('#btnDressCode').addEventListener('click', ()=> openModal('#modal-dresscode'));
-$('#btnDressCodeEn').addEventListener('click', ()=> openModal('#modal-dresscode'));
-$('#btnMusic').addEventListener('click', ()=> openModal('#modal-music'));
-$('#btnMusicEn').addEventListener('click', ()=> openModal('#modal-music'));
-$('#btnTips').addEventListener('click', ()=> openModal('#modal-tips'));
-$('#btnTipsEn').addEventListener('click', ()=> openModal('#modal-tips'));
-$('#btnGifts').addEventListener('click', ()=> openModal('#modal-gifts'));
-$('#btnGiftsEn').addEventListener('click', ()=> openModal('#modal-gifts'));
-$('#btnRsvp').addEventListener('click', ()=> openModal('#modal-rsvp'));
-$('#btnRsvpEn').addEventListener('click', ()=> openModal('#modal-rsvp'));
 
-/* ---------- Envío de formularios (Música y RSVP) ---------- */
+$('#btnLocationCeremony').addEventListener('click', ()=> openModal('#modal-location-ceremony'));
+$('#btnLocationCeremonyEn').addEventListener('click', ()=> openModal('#modal-location-ceremony-en'));
+$('#btnLocationCelebration').addEventListener('click', ()=> openModal('#modal-location-celebration'));
+$('#btnLocationCelebrationEn').addEventListener('click', ()=> openModal('#modal-location-celebration-en'));
+$('#btnDressCode').addEventListener('click', ()=> openModal('#modal-dresscode'));
+$('#btnDressCodeEn').addEventListener('click', ()=> openModal('#modal-dresscode-en'));
+$('#btnMusic').addEventListener('click', ()=> openModal('#modal-music'));
+$('#btnMusicEn').addEventListener('click', ()=> openModal('#modal-music-en'));
+$('#btnTips').addEventListener('click', ()=> openModal('#modal-tips'));
+$('#btnTipsEn').addEventListener('click', ()=> openModal('#modal-tips-en'));
+$('#btnGifts').addEventListener('click', ()=> openModal('#modal-gifts'));
+$('#btnGiftsEn').addEventListener('click', ()=> openModal('#modal-gifts-en'));
+$('#btnRsvp').addEventListener('click', ()=> openModal('#modal-rsvp'));
+$('#btnRsvpEn').addEventListener('click', ()=> openModal('#modal-rsvp-en'));
+
 async function submitToGoogleForm(data, formCfg){
   if(!formCfg || !formCfg.actionUrl) return;
   const body = new URLSearchParams();
@@ -1101,31 +1195,32 @@ async function submitForm(data, type){
   }
 }
 
-$('#formMusic').addEventListener('submit', async (e)=>{
-  e.preventDefault();
-  const fd = new FormData(e.target);
-  await submitForm(Object.fromEntries(fd), 'music');
-  e.target.classList.add('hide');
-  $('#thanksMusic').classList.add('show');
-  setTimeout(()=>{ closeModal($('#modal-music')); e.target.reset(); e.target.classList.remove('hide'); $('#thanksMusic').classList.remove('show'); }, 2200);
-});
+function wireForm(formEl, thanksEl, modalOverlay, type){
+  formEl.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    await submitForm(Object.fromEntries(fd), type);
+    e.target.classList.add('hide');
+    thanksEl.classList.add('show');
+    setTimeout(()=>{
+      closeModal(modalOverlay);
+      e.target.reset();
+      e.target.classList.remove('hide');
+      thanksEl.classList.remove('show');
+    }, 2200);
+  });
+}
+wireForm($('#formMusic'), $('#thanksMusic'), $('#modal-music'), 'music');
+wireForm($('#formMusicEn'), $('#thanksMusicEn'), $('#modal-music-en'), 'music');
+wireForm($('#formRsvp'), $('#thanksRsvp'), $('#modal-rsvp'), 'rsvp');
+wireForm($('#formRsvpEn'), $('#thanksRsvpEn'), $('#modal-rsvp-en'), 'rsvp');
 
-$('#formRsvp').addEventListener('submit', async (e)=>{
-  e.preventDefault();
-  const fd = new FormData(e.target);
-  await submitForm(Object.fromEntries(fd), 'rsvp');
-  e.target.classList.add('hide');
-  $('#thanksRsvp').classList.add('show');
-  setTimeout(()=>{ closeModal($('#modal-rsvp')); e.target.reset(); e.target.classList.remove('hide'); $('#thanksRsvp').classList.remove('show'); }, 2200);
-});
-
-/* ---------- Copiar datos bancarios ---------- */
 $$('.copy-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     const text = $('#' + btn.dataset.copy).textContent;
     navigator.clipboard?.writeText(text).then(()=>{
       const original = btn.textContent;
-      btn.textContent = '¡Copiado!';
+      btn.textContent = btn.dataset.copy.endsWith('-en') ? 'Copied!' : '¡Copiado!';
       setTimeout(()=> btn.textContent = original, 1500);
     });
   });
