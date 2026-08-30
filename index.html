@@ -66,11 +66,31 @@
   }
   .card{
     position:relative; width:100%; max-width:420px;
+  }
+  .card-inner{
+    position:relative; width:100%;
+    transition:transform .7s cubic-bezier(.4,.2,.2,1);
+    transform-style:preserve-3d;
+    cursor:pointer;
+  }
+  .card.is-flipped .card-inner{ transform:rotateY(180deg); }
+  .card-face{
     background:linear-gradient(180deg,var(--parchment),var(--parchment-2));
     border-radius:var(--r); border:1px solid var(--line);
     box-shadow:var(--shadow);
     padding:34px 30px; text-align:center;
+    backface-visibility:hidden; -webkit-backface-visibility:hidden;
   }
+  .card-front{ position:relative; }
+  .card-back{
+    position:absolute; inset:0; transform:rotateY(180deg);
+    overflow-y:auto; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .card-flip-hint{
+    margin-top:18px; font-size:10px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--ink-soft); opacity:.55; display:flex; align-items:center; justify-content:center; gap:6px;
+  }
+  .card-flip-hint svg{ width:13px; height:13px; stroke:var(--ink-soft); fill:none; stroke-width:1.6; }
   .card h2{
     font-family:var(--serif); font-style:italic; font-weight:500;
     font-size:clamp(26px,7vw,32px); color:var(--ink); margin-bottom:6px;
@@ -109,36 +129,16 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* Foto de fondo exclusiva de la portada. El degradado oscuro va
-     encima para que el sobre y los textos se sigan viendo con buen
-     contraste sin importar los tonos de la foto. Al abrir la
-     invitación, #cover.away se desvanece y desliza hacia arriba
-     (ver abajo), así que esta imagen desaparece junto con todo lo
-     demás automáticamente.
-
-     --cover-bg-pos controla qué PARTE de la foto se prioriza al
-     recortarla para llenar la pantalla (background-size:cover SIEMPRE
-     ocupa toda la pantalla en cualquier dispositivo, pero no sabe qué
-     parte de tu foto es la importante). Si en el celular se ve muy
-     "acercada" o corta algo importante, cambia el valor dentro del
-     media query de abajo. Ejemplos:
-       "center"        -> centrado normal
-       "center top"    -> prioriza la parte de ARRIBA (rostros altos)
-       "center 30%"    -> prioriza un punto específico (0%=arriba, 100%=abajo) */
   --cover-bg-pos: center;
   background:
     linear-gradient(180deg, rgba(18,32,26,.55), rgba(18,32,26,.82)),
-    url('images/fondo_portada.jpeg');
+    url('images/fondo-portada.jpg');
   background-size: cover;
   background-position: var(--cover-bg-pos);
   background-repeat: no-repeat;
   transition: transform 0.9s cubic-bezier(0.65,0,0.35,1), opacity 0.9s ease;
 }
 
-/* Pantallas angostas (la mayoría de celulares en vertical): al ser
-   mucho más altas que anchas, "cover" recorta bastante a los lados.
-   Ajusta este valor si necesitas mostrar más de la parte de arriba
-   o de abajo de tu foto en el celular. */
 @media (max-width: 480px){
   #cover{ --cover-bg-pos: center 30%; }
 }
@@ -149,36 +149,21 @@
   pointer-events: none;
 }
 
-/* Envoltorio del sobre para controlar el tamaño en pantalla */
 .envelope-wrap {
-  width: min(85vw, 340px); /* Ancho general del sobre en pantalla */
+  width: min(85vw, 340px);
   position: relative;
 }
 
-/* Contenedor del sobre */
 .real-envelope {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3; /* Proporción (Ancho / Alto) de tu lienzo */
+  aspect-ratio: 4 / 3;
   cursor: pointer;
-  overflow: visible; /* IMPORTANTE: Permite que la hoja suba sin cortar el borde superior */
-
-  /* ---------------------------------------------------------------
-     AJUSTES DE TAMAÑO ENTRE CAPAS
-     Cada PNG puede traer distinto margen transparente alrededor del
-     dibujo, así que aunque los contenedores midan igual, el dibujo se
-     ve de distinto tamaño. Sube o baja estos dos números (sin tocar
-     las imágenes) hasta lograr:
-       - "sobre-cuerpo.png" (el sobre abierto) del MISMO tamaño que
-         "sobre-cerrado.png".
-       - "sobre-hoja.png" (la tarjeta) MÁS CHICA, como si saliera de
-         adentro del sobre.
-     --------------------------------------------------------------- */
-  --body-scale: 1.18;  /* Agranda el sobre abierto. Sube a 1.25, 1.3... si aún se ve chico */
-  --sheet-scale: 1;    /* Escala extra de la hoja. Baja a .9, .85... si aún se ve muy grande */
+  overflow: visible;
+  --body-scale: 1.18;
+  --sheet-scale: 1;
 }
 
-/* Estilos base comunes para imágenes posicionadas */
 .real-envelope img {
   position: absolute;
   margin: 0;
@@ -186,12 +171,6 @@
   border: none;
 }
 
-/* ----------------------------------------------------
-   1 Y 2. SOBRE CERRADO Y SOBRE ABIERTO
-   Ambas capas parten del MISMO lienzo (100% x 100%). El sobre abierto
-   se escala desde el centro con --body-scale para igualar visualmente
-   el tamaño del sobre cerrado, sin desplazar su posición en pantalla.
-   ---------------------------------------------------- */
 .env-flap,
 .env-body {
   top: 0;
@@ -202,64 +181,46 @@
   transform-origin: center center;
 }
 
-/* 1. Sobre cerrado — es la referencia de tamaño, no se escala */
 .env-flap {
   z-index: 3;
   opacity: 1;
   transition: opacity 0.3s ease;
 }
 
-/* 2. Sobre abierto (Base) */
 .env-body {
   z-index: 1;
-  opacity: 0; /* Oculto inicialmente */
+  opacity: 0;
   transform: scale(var(--body-scale));
   transition: opacity 0.3s ease;
 }
 
-/* ----------------------------------------------------
-   3. HOJA / TARJETA (MÁS CHICA Y CENTRADA)
-   ---------------------------------------------------- */
 .env-sheet {
-  z-index: 2; /* Va entre el sobre abierto (1) y la solapa cerrada (3) */
-
-  /* Hacemos la hoja MÁS CHICA de ancho que el sobre */
-  width: 56%;  /* <-- Ajusta este valor si la quieres aún más chica o grande */
-  left: 22%;   /* <-- Centra la hoja automáticamente ( (100% - 56%) / 2 = 22% ) */
-
-  top: 20%;    /* Posición vertical dentro del sobre antes de abrir */
+  z-index: 2;
+  width: 56%;
+  left: 22%;
+  top: 20%;
   height: auto;
-  object-fit: contain; /* Preserva la imagen completa con sus bordes sin deformar ni recortar */
+  object-fit: contain;
   transform-origin: center center;
-
-  opacity: 0;  /* Oculta al inicio */
+  opacity: 0;
   transform: scale(var(--sheet-scale));
   transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
 }
 
-
-/* ===================================================
-   ANIMACIÓN AL HACER CLIC (.opening)
-   =================================================== */
-
-/* Ocultar sobre cerrado */
 #cover.opening .env-flap {
   opacity: 0;
   pointer-events: none;
 }
 
-/* Mostrar sobre abierto */
 #cover.opening .env-body {
   opacity: 1;
 }
 
-/* Animar la hoja saliendo hacia arriba (conserva su escala) */
 #cover.opening .env-sheet {
   opacity: 1;
-  transform: scale(var(--sheet-scale)) translateY(-55%); /* Eleva la tarjeta. Si quieres que suba más o menos, ajusta el -55% */
+  transform: scale(var(--sheet-scale)) translateY(-55%);
 }
 
-/* Botón y Caption */
 .open-btn {
   margin-top: 30px;
   width: 100%;
@@ -312,7 +273,7 @@
   .map-frame{ width:100%; height:220px; border:0; border-radius:var(--r); margin-top:18px; filter:sepia(.15) saturate(1.1); }
 
   /* ---------- Carousel ---------- */
-  #gallery .card{ max-width:460px; padding:34px 0; }
+  #gallery .card-face{ max-width:460px; padding:34px 0; }
   .carousel{ display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory; padding:0 24px 6px; -webkit-overflow-scrolling:touch; }
   .carousel::-webkit-scrollbar{ display:none; }
   .carousel img{
@@ -324,8 +285,11 @@
   .dots span.active{ background:var(--gold); width:16px; border-radius:4px; }
 
   /* ---------- Dress code ---------- */
-  .dress-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px; }
-  .dress-grid img{ width:100%; height:200px; object-fit:cover; border-radius:8px; }
+  .dress-single{ display:flex; justify-content:center; margin-top:20px; }
+  .dress-single img{
+    width:100%; max-width:280px; height:auto; object-fit:contain;
+    border-radius:8px; box-shadow:0 14px 30px rgba(0,0,0,.2); display:block;
+  }
   /* ---------- Closing ---------- */
   #closing .bg{
     position:absolute; inset:0; z-index:0;
@@ -409,16 +373,9 @@
 <div id="cover">
   <div class="envelope-wrap">
     <div class="real-envelope" id="openBtn">
-      
-      <!-- 1. BASE: El sobre abierto en el fondo -->
       <img src="images/sobre-cuerpo.png" alt="Sobre" class="env-body">
-
-      <!-- 2. MEDIO: La tarjeta que va dentro y se desliza hacia arriba -->
       <img src="images/sobre-hoja.png" alt="Invitación" class="env-sheet">
-
-      <!-- 3. FRENTE: La solapa cerrada con el sello dorado -->
       <img src="images/sobre-cerrado.png" alt="Solapa" class="env-flap">
-      
     </div>
 
     <div class="open-btn">
@@ -450,16 +407,34 @@
   <!-- CUENTA REGRESIVA -->
   <section class="panel" id="countdown">
     <div class="panel-inner">
-      <div class="card">
-        <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M14 6h20M14 42h20M15 6c0 8 18 8 18 8s-18 0-18 8s18 0 18 8"/><path d="M33 6c0 8-18 8-18 8s18 0 18 8s-18 0-18 8"/></svg></div>
-        <div class="eyebrow">Falta muy poco</div>
-        <h2>Cuenta regresiva</h2>
-        <div class="rule"></div>
-        <div class="countdown-grid">
-          <div class="cd-box"><div class="num" id="cd-days">00</div><div class="lab">Días</div></div>
-          <div class="cd-box"><div class="num" id="cd-hours">00</div><div class="lab">Hrs</div></div>
-          <div class="cd-box"><div class="num" id="cd-mins">00</div><div class="lab">Min</div></div>
-          <div class="cd-box"><div class="num" id="cd-secs">00</div><div class="lab">Seg</div></div>
+      <div class="card" data-flip>
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M14 6h20M14 42h20M15 6c0 8 18 8 18 8s-18 0-18 8s18 0 18 8"/><path d="M33 6c0 8-18 8-18 8s18 0 18 8s-18 0-18 8"/></svg></div>
+            <div class="eyebrow">Falta muy poco</div>
+            <h2>Cuenta regresiva</h2>
+            <div class="rule"></div>
+            <div class="countdown-grid">
+              <div class="cd-box"><div class="num js-cd-days">00</div><div class="lab">Días</div></div>
+              <div class="cd-box"><div class="num js-cd-hours">00</div><div class="lab">Hrs</div></div>
+              <div class="cd-box"><div class="num js-cd-mins">00</div><div class="lab">Min</div></div>
+              <div class="cd-box"><div class="num js-cd-secs">00</div><div class="lab">Seg</div></div>
+            </div>
+            <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Toca para ver en inglés</div>
+          </div>
+          <div class="card-face card-back">
+            <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M14 6h20M14 42h20M15 6c0 8 18 8 18 8s-18 0-18 8s18 0 18 8"/><path d="M33 6c0 8-18 8-18 8s18 0 18 8s-18 0-18 8"/></svg></div>
+            <div class="eyebrow">Almost time</div>
+            <h2>Countdown</h2>
+            <div class="rule"></div>
+            <div class="countdown-grid">
+              <div class="cd-box"><div class="num js-cd-days">00</div><div class="lab">Days</div></div>
+              <div class="cd-box"><div class="num js-cd-hours">00</div><div class="lab">Hrs</div></div>
+              <div class="cd-box"><div class="num js-cd-mins">00</div><div class="lab">Min</div></div>
+              <div class="cd-box"><div class="num js-cd-secs">00</div><div class="lab">Sec</div></div>
+            </div>
+            <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Tap to see in Spanish</div>
+          </div>
         </div>
       </div>
     </div>
@@ -468,17 +443,35 @@
   <!-- CEREMONIA -->
   <section class="panel" id="ceremony">
     <div class="panel-inner">
-      <div class="card">
-        <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M24 5v8M20 9h8"/><path d="M24 13l14 11v18H10V24z"/><path d="M19 32c0-4 2-6 5-6s5 2 5 6v10H19z"/><path d="M6 42h36"/></svg></div>
-        <div class="eyebrow">Nos unimos en</div>
-        <h2>Ceremonia</h2>
-        <div class="rule"></div>
-        <div class="schedule">
-          <div class="schedule-item"><span class="lab">Fecha</span><span class="val" id="ceremony-date">—</span></div>
-          <div class="schedule-item"><span class="lab">Hora</span><span class="val" id="ceremony-time">—</span></div>
+      <div class="card" data-flip>
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M24 5v8M20 9h8"/><path d="M24 13l14 11v18H10V24z"/><path d="M19 32c0-4 2-6 5-6s5 2 5 6v10H19z"/><path d="M6 42h36"/></svg></div>
+            <div class="eyebrow">Nos unimos en</div>
+            <h2>Ceremonia</h2>
+            <div class="rule"></div>
+            <div class="schedule">
+              <div class="schedule-item"><span class="lab">Fecha</span><span class="val js-ceremony-date">—</span></div>
+              <div class="schedule-item"><span class="lab">Hora</span><span class="val js-ceremony-time">—</span></div>
+            </div>
+            <p class="js-ceremony-place" style="margin-top:16px;">—</p>
+            <button class="btn" id="btnLocationCeremony">¿Cómo llegar?</button>
+            <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Toca para ver en inglés</div>
+          </div>
+          <div class="card-face card-back">
+            <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M24 5v8M20 9h8"/><path d="M24 13l14 11v18H10V24z"/><path d="M19 32c0-4 2-6 5-6s5 2 5 6v10H19z"/><path d="M6 42h36"/></svg></div>
+            <div class="eyebrow">We're getting married at</div>
+            <h2>Ceremony</h2>
+            <div class="rule"></div>
+            <div class="schedule">
+              <div class="schedule-item"><span class="lab">Date</span><span class="val js-ceremony-date">—</span></div>
+              <div class="schedule-item"><span class="lab">Time</span><span class="val js-ceremony-time">—</span></div>
+            </div>
+            <p class="js-ceremony-place" style="margin-top:16px;">—</p>
+            <button class="btn" id="btnLocationCeremonyEn">How to get there?</button>
+            <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Tap to see in Spanish</div>
+          </div>
         </div>
-        <p id="ceremony-place" style="margin-top:16px;">—</p>
-        <button class="btn" id="btnLocationCeremony">¿Cómo llegar?</button>
       </div>
     </div>
   </section>
@@ -486,17 +479,35 @@
   <!-- CELEBRACIÓN -->
   <section class="panel" id="celebration">
     <div class="panel-inner">
-      <div class="card">
-        <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M14 6h8l-1 12a3 3 0 0 1-6 0z"/><path d="M18 18v14M13 32h10"/><path d="M34 10h6l-.6 8a2.4 2.4 0 0 1-4.8 0z"/><path d="M37 18v14M32 32h10"/></svg></div>
-        <div class="eyebrow">Continuamos en</div>
-        <h2>Celebración</h2>
-        <div class="rule"></div>
-        <div class="schedule">
-          <div class="schedule-item"><span class="lab">Fecha</span><span class="val" id="celebration-date">—</span></div>
-          <div class="schedule-item"><span class="lab">Hora</span><span class="val" id="celebration-time">—</span></div>
+      <div class="card" data-flip>
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M14 6h8l-1 12a3 3 0 0 1-6 0z"/><path d="M18 18v14M13 32h10"/><path d="M34 10h6l-.6 8a2.4 2.4 0 0 1-4.8 0z"/><path d="M37 18v14M32 32h10"/></svg></div>
+            <div class="eyebrow">Continuamos en</div>
+            <h2>Celebración</h2>
+            <div class="rule"></div>
+            <div class="schedule">
+              <div class="schedule-item"><span class="lab">Fecha</span><span class="val js-celebration-date">—</span></div>
+              <div class="schedule-item"><span class="lab">Hora</span><span class="val js-celebration-time">—</span></div>
+            </div>
+            <p class="js-celebration-place" style="margin-top:16px;">—</p>
+            <button class="btn" id="btnLocationCelebration">¿Cómo llegar?</button>
+            <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Toca para ver en inglés</div>
+          </div>
+          <div class="card-face card-back">
+            <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M14 6h8l-1 12a3 3 0 0 1-6 0z"/><path d="M18 18v14M13 32h10"/><path d="M34 10h6l-.6 8a2.4 2.4 0 0 1-4.8 0z"/><path d="M37 18v14M32 32h10"/></svg></div>
+            <div class="eyebrow">Continuing at</div>
+            <h2>Reception</h2>
+            <div class="rule"></div>
+            <div class="schedule">
+              <div class="schedule-item"><span class="lab">Date</span><span class="val js-celebration-date">—</span></div>
+              <div class="schedule-item"><span class="lab">Time</span><span class="val js-celebration-time">—</span></div>
+            </div>
+            <p class="js-celebration-place" style="margin-top:16px;">—</p>
+            <button class="btn" id="btnLocationCelebrationEn">How to get there?</button>
+            <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Tap to see in Spanish</div>
+          </div>
         </div>
-        <p id="celebration-place" style="margin-top:16px;">—</p>
-        <button class="btn" id="btnLocationCelebration">¿Cómo llegar?</button>
       </div>
     </div>
   </section>
@@ -504,23 +515,37 @@
   <!-- GALERÍA -->
   <section class="panel" id="gallery">
     <div class="panel-inner">
-      <div class="card">
-        <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M24 40C10 30 6 22 6 15a9 9 0 0 1 18-1a9 9 0 0 1 18 1c0 7-4 15-18 25z"/></svg></div>
-        <div class="eyebrow">Nuestra historia</div>
-        <h2>Galería</h2>
-        <div class="rule"></div>
-        <div class="carousel" id="carousel">
-          <img src="images/foto-1.jpeg" alt="Foto de la pareja 1" loading="lazy">
-          <img src="images/foto-2.jpeg" alt="Foto de la pareja 2" loading="lazy">
-          <img src="images/foto-3.jpeg" alt="Foto de la pareja 3" loading="lazy">
-          <img src="images/foto-4.jpeg" alt="Foto de la pareja 4" loading="lazy">
-          <img src="images/foto-5.jpeg" alt="Foto de la pareja 4" loading="lazy">
-          <img src="images/foto-6.jpeg" alt="Foto de la pareja 4" loading="lazy">
-          <img src="images/foto-7.jpeg" alt="Foto de la pareja 4" loading="lazy">
-          <img src="images/foto-8.jpeg" alt="Foto de la pareja 4" loading="lazy">
-          <img src="images/foto-9.jpeg" alt="Foto de la pareja 4" loading="lazy">
+      <div class="card" data-flip>
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M24 40C10 30 6 22 6 15a9 9 0 0 1 18-1a9 9 0 0 1 18 1c0 7-4 15-18 25z"/></svg></div>
+            <div class="eyebrow">Nuestra historia</div>
+            <h2>Galería</h2>
+            <div class="rule"></div>
+            <div class="carousel" id="carousel">
+              <img src="images/foto-1.jpeg" alt="Foto de la pareja 1" loading="lazy">
+              <img src="images/foto-2.jpeg" alt="Foto de la pareja 2" loading="lazy">
+              <img src="images/foto-3.jpeg" alt="Foto de la pareja 3" loading="lazy">
+              <img src="images/foto-4.jpeg" alt="Foto de la pareja 4" loading="lazy">
+              <img src="images/foto-5.jpeg" alt="Foto de la pareja 5" loading="lazy">
+              <img src="images/foto-6.jpeg" alt="Foto de la pareja 6" loading="lazy">
+              <img src="images/foto-7.jpeg" alt="Foto de la pareja 7" loading="lazy">
+              <img src="images/foto-8.jpeg" alt="Foto de la pareja 8" loading="lazy">
+              <img src="images/foto-9.jpeg" alt="Foto de la pareja 9" loading="lazy">
+              <img src="images/foto-10.jpg" alt="Foto de la pareja 10" loading="lazy">
+            </div>
+            <div class="dots" id="carouselDots"></div>
+            <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Toca fuera de las fotos para ver en inglés</div>
+          </div>
+          <div class="card-face card-back">
+            <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M24 40C10 30 6 22 6 15a9 9 0 0 1 18-1a9 9 0 0 1 18 1c0 7-4 15-18 25z"/></svg></div>
+            <div class="eyebrow">Our story</div>
+            <h2>Gallery</h2>
+            <div class="rule"></div>
+            <p>A few of our favorite moments together. Swipe through the photos on the front side of this card to see them all.</p>
+            <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Tap to see in Spanish</div>
+          </div>
         </div>
-        <div class="dots" id="carouselDots"></div>
       </div>
     </div>
   </section>
@@ -528,13 +553,27 @@
   <!-- MÚSICA -->
   <section class="panel" id="music">
     <div class="panel-inner">
-      <div class="card">
-        <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M18 34a5 5 0 1 1 0-10a5 5 0 0 1 0 10z"/><path d="M23 24V8l14-3v16"/><path d="M32 21a5 5 0 1 1 5 5"/></svg></div>
-        <div class="eyebrow">Ambienta la fiesta</div>
-        <h2>Música</h2>
-        <div class="rule"></div>
-        <p>Ayúdanos a armar el playlist de la noche. ¿Qué canción no puede faltar en la pista?</p>
-        <button class="btn solid" id="btnMusic">Sugerir Canción</button>
+      <div class="card" data-flip>
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M18 34a5 5 0 1 1 0-10a5 5 0 0 1 0 10z"/><path d="M23 24V8l14-3v16"/><path d="M32 21a5 5 0 1 1 5 5"/></svg></div>
+            <div class="eyebrow">Ambienta la fiesta</div>
+            <h2>Música</h2>
+            <div class="rule"></div>
+            <p>Ayúdanos a armar el playlist de la noche. ¿Qué canción no puede faltar en la pista?</p>
+            <button class="btn solid" id="btnMusic">Sugerir Canción</button>
+            <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Toca para ver en inglés</div>
+          </div>
+          <div class="card-face card-back">
+            <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M18 34a5 5 0 1 1 0-10a5 5 0 0 1 0 10z"/><path d="M23 24V8l14-3v16"/><path d="M32 21a5 5 0 1 1 5 5"/></svg></div>
+            <div class="eyebrow">Set the mood</div>
+            <h2>Music</h2>
+            <div class="rule"></div>
+            <p>Help us build the night's playlist. What song can't be missing on the dance floor?</p>
+            <button class="btn solid" id="btnMusicEn">Suggest a Song</button>
+            <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Tap to see in Spanish</div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -542,17 +581,33 @@
   <!-- DRESS CODE -->
   <section class="panel" id="dresscode">
     <div class="panel-inner">
-      <div class="card">
-        <div class="card-icon"><svg viewBox="0 0 48 48"><circle cx="24" cy="9" r="3"/><path d="M24 12v5"/><path d="M24 17l18 13a3 3 0 0 1-2 5H8a3 3 0 0 1-2-5z"/><path d="M14 30h20"/></svg></div>
-        <div class="eyebrow">Código de vestimenta</div>
-        <h2>Dress Code</h2>
-        <div class="rule"></div>
-        <p>Formal — te invitamos a acompañarnos con elegancia.</p>
-        <div class="dress-grid">
-          <img src="images/dresscode-hombre.jpg" alt="Referencia de traje formal para hombre">
-          <img src="images/dresscode-mujer.jpg" alt="Referencia de vestido formal para mujer">
+      <div class="card" data-flip>
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <div class="card-icon"><svg viewBox="0 0 48 48"><circle cx="24" cy="9" r="3"/><path d="M24 12v5"/><path d="M24 17l18 13a3 3 0 0 1-2 5H8a3 3 0 0 1-2-5z"/><path d="M14 30h20"/></svg></div>
+            <div class="eyebrow">Código de vestimenta</div>
+            <h2>Dress Code</h2>
+            <div class="rule"></div>
+            <p>Formal — te invitamos a acompañarnos con elegancia.</p>
+            <div class="dress-single">
+              <img src="images/dresscode.jpg" alt="Referencia de vestimenta formal">
+            </div>
+            <button class="btn" id="btnDressCode">Ver más</button>
+            <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Toca para ver en inglés</div>
+          </div>
+          <div class="card-face card-back">
+            <div class="card-icon"><svg viewBox="0 0 48 48"><circle cx="24" cy="9" r="3"/><path d="M24 12v5"/><path d="M24 17l18 13a3 3 0 0 1-2 5H8a3 3 0 0 1-2-5z"/><path d="M14 30h20"/></svg></div>
+            <div class="eyebrow">Dress code</div>
+            <h2>Dress Code</h2>
+            <div class="rule"></div>
+            <p>Formal attire — we invite you to join us with elegance.</p>
+            <div class="dress-single">
+              <img src="images/dresscode.jpg" alt="Formal attire reference">
+            </div>
+            <button class="btn" id="btnDressCodeEn">See more</button>
+            <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Tap to see in Spanish</div>
+          </div>
         </div>
-        <button class="btn" id="btnDressCode">Ver más</button>
       </div>
     </div>
   </section>
@@ -560,13 +615,27 @@
   <!-- TIPS Y NOTAS -->
   <section class="panel" id="tips">
     <div class="panel-inner">
-      <div class="card">
-        <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M12 6h18l6 6v30H12z"/><path d="M30 6v6h6"/><path d="M18 22h12M18 28h12M18 34h8"/></svg></div>
-        <div class="eyebrow">Antes de venir</div>
-        <h2>Tips y Notas</h2>
-        <div class="rule"></div>
-        <p>Unos detalles para que disfrutes la celebración al máximo.</p>
-        <button class="btn" id="btnTips">Ver más</button>
+      <div class="card" data-flip>
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M12 6h18l6 6v30H12z"/><path d="M30 6v6h6"/><path d="M18 22h12M18 28h12M18 34h8"/></svg></div>
+            <div class="eyebrow">Antes de venir</div>
+            <h2>Tips y Notas</h2>
+            <div class="rule"></div>
+            <p>Unos detalles para que disfrutes la celebración al máximo.</p>
+            <button class="btn" id="btnTips">Ver más</button>
+            <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Toca para ver en inglés</div>
+          </div>
+          <div class="card-face card-back">
+            <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M12 6h18l6 6v30H12z"/><path d="M30 6v6h6"/><path d="M18 22h12M18 28h12M18 34h8"/></svg></div>
+            <div class="eyebrow">Before you come</div>
+            <h2>Tips & Notes</h2>
+            <div class="rule"></div>
+            <p>A few details so you can enjoy the celebration to the fullest.</p>
+            <button class="btn" id="btnTipsEn">See more</button>
+            <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Tap to see in Spanish</div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -574,13 +643,27 @@
   <!-- REGALOS -->
   <section class="panel" id="gifts">
     <div class="panel-inner">
-      <div class="card">
-        <div class="card-icon"><svg viewBox="0 0 48 48"><rect x="8" y="18" width="32" height="9" rx="1.5"/><rect x="11" y="27" width="26" height="15" rx="1.5"/><path d="M24 18v24"/><path d="M24 18c-2-6-13-6-9 0M24 18c2-6 13-6 9 0"/></svg></div>
-        <div class="eyebrow">Con cariño</div>
-        <h2>Regalos</h2>
-        <div class="rule"></div>
-        <p>Si quieres darnos algo más que tu hermosa presencia…</p>
-        <button class="btn" id="btnGifts">Ver más</button>
+      <div class="card" data-flip>
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <div class="card-icon"><svg viewBox="0 0 48 48"><rect x="8" y="18" width="32" height="9" rx="1.5"/><rect x="11" y="27" width="26" height="15" rx="1.5"/><path d="M24 18v24"/><path d="M24 18c-2-6-13-6-9 0M24 18c2-6 13-6 9 0"/></svg></div>
+            <div class="eyebrow">Con cariño</div>
+            <h2>Regalos</h2>
+            <div class="rule"></div>
+            <p>Si quieres darnos algo más que tu hermosa presencia…</p>
+            <button class="btn" id="btnGifts">Ver más</button>
+            <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Toca para ver en inglés</div>
+          </div>
+          <div class="card-face card-back">
+            <div class="card-icon"><svg viewBox="0 0 48 48"><rect x="8" y="18" width="32" height="9" rx="1.5"/><rect x="11" y="27" width="26" height="15" rx="1.5"/><path d="M24 18v24"/><path d="M24 18c-2-6-13-6-9 0M24 18c2-6 13-6 9 0"/></svg></div>
+            <div class="eyebrow">With love</div>
+            <h2>Gifts</h2>
+            <div class="rule"></div>
+            <p>If you'd like to give us something beyond your lovely presence…</p>
+            <button class="btn" id="btnGiftsEn">See more</button>
+            <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Tap to see in Spanish</div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -590,13 +673,27 @@
   <!-- RSVP -->
   <section class="panel" id="rsvp">
     <div class="panel-inner">
-      <div class="card">
-        <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M9 12h30M9 24h30M9 36h20"/><path d="M9 12l3 3 5-5M9 24l3 3 5-5"/></svg></div>
-        <div class="eyebrow">Última confirmación</div>
-        <h2>Confirmación</h2>
-        <div class="rule"></div>
-        <p>¿Nos acompañas en este día tan especial? Confirma antes de <span id="rsvp-deadline">—</span>.</p>
-        <button class="btn solid" id="btnRsvp">Confirmar asistencia</button>
+      <div class="card" data-flip>
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M9 12h30M9 24h30M9 36h20"/><path d="M9 12l3 3 5-5M9 24l3 3 5-5"/></svg></div>
+            <div class="eyebrow">Última confirmación</div>
+            <h2>Confirmación</h2>
+            <div class="rule"></div>
+            <p>¿Nos acompañas en este día tan especial? Confirma antes de <span class="js-rsvp-deadline">—</span>.</p>
+            <button class="btn solid" id="btnRsvp">Confirmar asistencia</button>
+            <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Toca para ver en inglés</div>
+          </div>
+          <div class="card-face card-back">
+            <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M9 12h30M9 24h30M9 36h20"/><path d="M9 12l3 3 5-5M9 24l3 3 5-5"/></svg></div>
+            <div class="eyebrow">Last confirmation</div>
+            <h2>RSVP</h2>
+            <div class="rule"></div>
+            <p>Will you join us on this special day? Please confirm before <span class="js-rsvp-deadline">—</span>.</p>
+            <button class="btn solid" id="btnRsvpEn">Confirm attendance</button>
+            <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Tap to see in Spanish</div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -765,8 +862,6 @@ const CONFIG = {
     placeName: "Templo de Santa Rita de Casia",
     address: "Av Guadalupe 1668A, Chapalita Oriente, 45040 Zapopan, Jal.",
     mapsQuery: "Av Guadalupe 1668A, Chapalita Oriente, 45040 Zapopan, Jal.",
-    // Coordenadas exactas del templo (más precisas que la dirección de
-    // texto, que a veces Google Maps geolocaliza al lugar vecino).
     coords: { lat: 20.66614514230394, lng: -103.40650741112233 }
   },
 
@@ -778,24 +873,14 @@ const CONFIG = {
     placeName: "Goretti Eventos",
     address: "Periférico, C. López Cotilla 414, Tonalá, Jal.",
     mapsQuery: "Periférico, C. López Cotilla 414, Tonalá, Jal.",
-    // Si más adelante consigues las coordenadas exactas del salón,
-    // agrégalas igual que arriba: { lat: ..., lng: ... }
     coords: null
   },
 
   rsvpDeadline: "15 de noviembre de 2026",
   bankAccount: "Cuenta XXXX XXXX XXXX XXXX",
   paypalEmail: "correopaypal@gmail.com",
-  // Pega aquí tu endpoint de Formspree (https://formspree.io) para recibir
-  // por correo las respuestas de "Sugerir Canción" y "Confirmar Asistencia".
-  // Si lo dejas vacío, las respuestas solo se guardan en el navegador del invitado.
   formEndpoint: "",
 
-  // --- Google Forms (respuestas ILIMITADAS y gratis para siempre) ---
-  // Cada formulario de la invitación (Música y RSVP) envía sus datos a un
-  // Google Form "invisible" para el invitado —solo ve tu diseño bonito—
-  // y las respuestas caen automáticamente en una Hoja de Cálculo de Google.
-  // Ver instrucciones completas de cómo llenar esto en el chat con Claude.
   googleForms: {
     music: {
       actionUrl: "https://docs.google.com/forms/d/e/1FAIpQLSetZHZMZ_X4N099Ix7wnRcv5qqtnxVCLrgzd9b2HH2BYY52Nw/formResponse",
@@ -817,33 +902,20 @@ const CONFIG = {
   },
 
   // --- Foto de fondo de cada apartado ---
-  // Cada apartado puede tener su propia foto de fondo (bodas, flores, etc.)
-  // detrás de la tarjeta. Coloca tus fotos en una carpeta "images/backgrounds"
-  // y escribe aquí la ruta de cada una. Si dejas una ruta que no existe,
-  // ese apartado simplemente se queda con el fondo verde de siempre
-  // (no se rompe nada, no aparece un ícono de "imagen rota").
-  //
-  // Cada foto se recorta y estira automáticamente para llenar la pantalla
-  // de cualquier dispositivo (celular, tablet, PC) sin deformarse.
-  // Si el recorte le corta una parte importante a la foto (por ejemplo,
-  // se comen las flores y solo se ve pasto), puedes escribir la entrada
-  // como un objeto en vez de solo texto, agregando "position" para decirle
-  // qué parte de la foto priorizar. Ejemplos de position:
-  //   "center top"    -> prioriza la parte de ARRIBA de la foto
-  //   "center bottom" -> prioriza la parte de ABAJO de la foto
-  //   "center 30%"    -> prioriza un punto específico (0%=arriba, 100%=abajo)
+  // Todos apuntan a la misma imagen "countdown.jpg" (según lo pedido),
+  // menos el cierre, que sigue usando su propia foto (images/cierre.jpeg,
+  // ver más abajo en el CSS de #closing .bg — ese no forma parte de este
+  // listado porque no es un apartado con .card, es la pantalla final).
   sectionBackgrounds: {
-    countdown:   "images/backgrounds/countdown.jpeg",
-    ceremony:    "images/backgrounds/ceremony.jpg",
-    celebration: "images/backgrounds/celebration.jpg",
-    gallery:     "images/backgrounds/gallery.jpg",
-    music:       "images/backgrounds/music.jpg",
-    dresscode:   "images/backgrounds/dresscode.jpg",
-    tips:        "images/backgrounds/tips.jpg",
-    gifts:       "images/backgrounds/gifts.jpg",
-    // Ejemplo de cómo ajustar el recorte de una foto en particular:
-    // rsvp: { src: "images/backgrounds/rsvp.jpg", position: "center top" },
-    rsvp:        "images/backgrounds/rsvp.jpg"
+    countdown:   "images/backgrounds/countdown.jpg",
+    ceremony:    "images/backgrounds/countdown.jpg",
+    celebration: "images/backgrounds/countdown.jpg",
+    gallery:     "images/backgrounds/countdown.jpg",
+    music:       "images/backgrounds/countdown.jpg",
+    dresscode:   "images/backgrounds/countdown.jpg",
+    tips:        "images/backgrounds/countdown.jpg",
+    gifts:       "images/backgrounds/countdown.jpg",
+    rsvp:        "images/backgrounds/countdown.jpg"
   }
 };
 
@@ -851,18 +923,18 @@ const CONFIG = {
 const $ = (sel, ctx=document) => ctx.querySelector(sel);
 const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
 
-/* ---------- Rellenar Ceremonia / Celebración ---------- */
-$('#ceremony-date').textContent = CONFIG.ceremony.dateLabel;
-$('#ceremony-time').textContent = CONFIG.ceremony.timeLabel;
-$('#ceremony-place').textContent = CONFIG.ceremony.placeName + ' — ' + CONFIG.ceremony.address;
+/* ---------- Rellenar Ceremonia / Celebración (frente Y dorso a la vez) ---------- */
+$$('.js-ceremony-date').forEach(el => el.textContent = CONFIG.ceremony.dateLabel);
+$$('.js-ceremony-time').forEach(el => el.textContent = CONFIG.ceremony.timeLabel);
+$$('.js-ceremony-place').forEach(el => el.textContent = CONFIG.ceremony.placeName + ' — ' + CONFIG.ceremony.address);
 $('#modal-ceremony-address').textContent = CONFIG.ceremony.placeName + ', ' + CONFIG.ceremony.address;
 
-$('#celebration-date').textContent = CONFIG.celebration.dateLabel;
-$('#celebration-time').textContent = CONFIG.celebration.timeLabel;
-$('#celebration-place').textContent = CONFIG.celebration.placeName + ' — ' + CONFIG.celebration.address;
+$$('.js-celebration-date').forEach(el => el.textContent = CONFIG.celebration.dateLabel);
+$$('.js-celebration-time').forEach(el => el.textContent = CONFIG.celebration.timeLabel);
+$$('.js-celebration-place').forEach(el => el.textContent = CONFIG.celebration.placeName + ' — ' + CONFIG.celebration.address);
 $('#modal-celebration-address').textContent = CONFIG.celebration.placeName + ', ' + CONFIG.celebration.address;
 
-$('#rsvp-deadline').textContent = CONFIG.rsvpDeadline;
+$$('.js-rsvp-deadline').forEach(el => el.textContent = CONFIG.rsvpDeadline);
 $('#bank-account').textContent = CONFIG.bankAccount;
 $('#bank-paypal').textContent = CONFIG.paypalEmail;
 
@@ -890,14 +962,7 @@ const celebrationMaps = buildMapsUrls(CONFIG.celebration);
 $('#mapFrameCelebration').src = celebrationMaps.embed;
 $('#openMapsBtnCelebration').href = celebrationMaps.link;
 
-
-
-/* ---------- Foto de fondo por apartado ----------
-   Se pinta directamente como fondo del <section>, así que la tarjeta
-   (que siempre tiene su propio color sólido) queda encima sin problema
-   y no hace falta tocar el HTML. El degradado verde oscuro va SIEMPRE
-   encima de la foto para que todas las fotos —aunque sean de tonos muy
-   distintos entre sí— se vean unificadas con el resto de la invitación. */
+/* ---------- Foto de fondo por apartado ---------- */
 Object.entries(CONFIG.sectionBackgrounds).forEach(([id, cfg]) => {
   const panel = document.getElementById(id);
   if(!panel || !cfg) return;
@@ -911,33 +976,26 @@ Object.entries(CONFIG.sectionBackgrounds).forEach(([id, cfg]) => {
   panel.style.backgroundRepeat = 'no-repeat';
 });
 
-/* ---------- JavaScript Corregido ---------- */
-
+/* ---------- JavaScript del sobre ---------- */
 const cover = document.getElementById('cover');
-const openBtn = document.getElementById('openBtn'); 
-const openBtnText = document.getElementById('openBtnText'); 
+const openBtn = document.getElementById('openBtn');
+const openBtnText = document.getElementById('openBtnText');
 
 function openInvitation() {
   if (!cover || cover.classList.contains('opening')) return;
-
-  // 1. Oculta sobre-cerrado, muestra sobre-cuerpo y eleva la sobre-hoja
   cover.classList.add('opening');
-
-  // 2. Espera 3.5 segundos para apreciar la hoja fuera del sobre antes de deslizar la pantalla completa
   setTimeout(() => {
     cover.classList.add('away');
-    
     if (document.body.classList.contains('not-opened')) {
       document.body.classList.remove('not-opened');
       document.body.classList.add('opened');
     }
-  }, 1500); 
+  }, 1500);
 }
-
 if (openBtn) openBtn.addEventListener('click', openInvitation);
 if (openBtnText) openBtnText.addEventListener('click', openInvitation);
 
-/* ---------- Countdown (apunta a la Ceremonia) ---------- */
+/* ---------- Countdown (apunta a la Ceremonia, actualiza AMBAS caras) ---------- */
 function updateCountdown(){
   const target = new Date(CONFIG.ceremony.dateISO).getTime();
   const now = Date.now();
@@ -946,10 +1004,10 @@ function updateCountdown(){
   const hours = Math.floor(diff / 3600000); diff -= hours*3600000;
   const mins = Math.floor(diff / 60000); diff -= mins*60000;
   const secs = Math.floor(diff / 1000);
-  $('#cd-days').textContent = String(days).padStart(2,'0');
-  $('#cd-hours').textContent = String(hours).padStart(2,'0');
-  $('#cd-mins').textContent = String(mins).padStart(2,'0');
-  $('#cd-secs').textContent = String(secs).padStart(2,'0');
+  $$('.js-cd-days').forEach(el => el.textContent = String(days).padStart(2,'0'));
+  $$('.js-cd-hours').forEach(el => el.textContent = String(hours).padStart(2,'0'));
+  $$('.js-cd-mins').forEach(el => el.textContent = String(mins).padStart(2,'0'));
+  $$('.js-cd-secs').forEach(el => el.textContent = String(secs).padStart(2,'0'));
 }
 updateCountdown();
 setInterval(updateCountdown, 1000);
@@ -968,6 +1026,20 @@ carousel.addEventListener('scroll', () => {
   $$('span', dotsWrap).forEach((d,i)=> d.classList.toggle('active', i===idx));
 }, { passive:true });
 
+/* ---------- Volteo de tarjetas (ES / EN) ----------
+   Al presionar en cualquier parte "vacía" de una tarjeta, se voltea
+   para mostrar el mismo contenido en inglés. Si el toque fue sobre un
+   botón, enlace, campo de formulario o dentro del carrusel de fotos,
+   NO se voltea la tarjeta — para que esos elementos sigan funcionando
+   con normalidad (abrir modales, hacer scroll a las fotos, etc). */
+$$('.card[data-flip]').forEach(card => {
+  const inner = $('.card-inner', card);
+  inner.addEventListener('click', (e) => {
+    if (e.target.closest('button, a, input, textarea, select, label, .carousel')) return;
+    card.classList.toggle('is-flipped');
+  });
+});
+
 /* ---------- Modales genéricos ---------- */
 function openModal(id){
   $(id).classList.add('open');
@@ -981,21 +1053,24 @@ $$('[data-modal]').forEach(overlay=>{
   overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(overlay); });
   $('[data-close]', overlay).addEventListener('click', ()=> closeModal(overlay));
 });
+// Los botones del dorso (id...En) abren el MISMO modal que su versión en
+// español — el modal en sí no está traducido, solo la tarjeta.
 $('#btnLocationCeremony').addEventListener('click', ()=> openModal('#modal-location-ceremony'));
+$('#btnLocationCeremonyEn').addEventListener('click', ()=> openModal('#modal-location-ceremony'));
 $('#btnLocationCelebration').addEventListener('click', ()=> openModal('#modal-location-celebration'));
+$('#btnLocationCelebrationEn').addEventListener('click', ()=> openModal('#modal-location-celebration'));
 $('#btnDressCode').addEventListener('click', ()=> openModal('#modal-dresscode'));
+$('#btnDressCodeEn').addEventListener('click', ()=> openModal('#modal-dresscode'));
 $('#btnMusic').addEventListener('click', ()=> openModal('#modal-music'));
+$('#btnMusicEn').addEventListener('click', ()=> openModal('#modal-music'));
 $('#btnTips').addEventListener('click', ()=> openModal('#modal-tips'));
+$('#btnTipsEn').addEventListener('click', ()=> openModal('#modal-tips'));
 $('#btnGifts').addEventListener('click', ()=> openModal('#modal-gifts'));
+$('#btnGiftsEn').addEventListener('click', ()=> openModal('#modal-gifts'));
 $('#btnRsvp').addEventListener('click', ()=> openModal('#modal-rsvp'));
+$('#btnRsvpEn').addEventListener('click', ()=> openModal('#modal-rsvp'));
 
-/* ---------- Envío de formularios (Música y RSVP) ----------
-   Orden de intentos, todos ocurren siempre que estén configurados:
-   1) Se guarda una copia local en el navegador del invitado (respaldo).
-   2) Si CONFIG.googleForms.<tipo>.actionUrl está lleno, se manda ahí
-      (gratis e ilimitado para siempre — la opción recomendada).
-   3) Si además CONFIG.formEndpoint está lleno (Formspree), también se
-      manda ahí. Puedes usar solo uno de los dos, o ambos a la vez. */
+/* ---------- Envío de formularios (Música y RSVP) ---------- */
 async function submitToGoogleForm(data, formCfg){
   if(!formCfg || !formCfg.actionUrl) return;
   const body = new URLSearchParams();
@@ -1003,9 +1078,6 @@ async function submitToGoogleForm(data, formCfg){
     if(entryId && data[field] !== undefined) body.append(entryId, data[field]);
   });
   try{
-    // mode:'no-cors' es obligatorio para escribir en Google Forms desde
-    // otra página; el navegador no deja leer la respuesta, pero el envío
-    // sí llega — es el comportamiento esperado, no un error.
     await fetch(formCfg.actionUrl, { method:'POST', mode:'no-cors', body });
   }catch(err){ console.warn('No se pudo enviar a Google Forms', err); }
 }
