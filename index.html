@@ -86,10 +86,11 @@
     display:flex; flex-direction:column; align-items:center; justify-content:center;
   }
   .card-badge{
-    position:absolute; top:-30px; left:50%; transform:translateX(-50%);
-    width:66px; height:66px; z-index:6; pointer-events:none;
+    position:absolute; top:-34px; left:50%; transform:translateX(-50%);
+    width:72px; height:72px; z-index:6; pointer-events:none;
+    border-radius:50%; overflow:hidden;
   }
-  .card-badge img{ width:100%; height:100%; object-fit:contain; display:block; }
+  .card-badge img{ width:100%; height:100%; object-fit:cover; display:block; }
   .card-flip-hint{
     margin-top:18px; font-size:10px; letter-spacing:.14em; text-transform:uppercase;
     color:var(--ink-soft); opacity:.55; display:flex; align-items:center; justify-content:center; gap:6px;
@@ -197,9 +198,9 @@
 
 .env-sheet {
   z-index: 2;
-  width: 56%;
-  left: 22%;
-  top: 20%;
+  width: 26%;
+  left: 37%;
+  top: 30%;
   height: auto;
   object-fit: contain;
   transform-origin: center center;
@@ -219,7 +220,7 @@
 
 #cover.opening .env-sheet {
   opacity: 1;
-  transform: scale(var(--sheet-scale)) translateY(-55%);
+  transform: scale(var(--sheet-scale)) translateY(-85%);
 }
 
 .open-btn {
@@ -238,6 +239,36 @@
   text-align: center;
   opacity: 0.85;
 }
+
+/* ---------- Boton flotante de musica ---------- */
+#musicToggle{
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 60;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--bg-deep);
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 20px rgba(0,0,0,.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity .4s ease, transform .4s ease;
+}
+body.opened #musicToggle{
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+#musicToggle svg{ width: 20px; height: 20px; stroke: var(--gold-soft); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+#musicToggle .icon-muted{ display: none; }
+#musicToggle.is-muted .icon-playing{ display: none; }
+#musicToggle.is-muted .icon-muted{ display: block; }
 
   #names .bg{
     position:absolute; inset:0; z-index:0;
@@ -295,9 +326,8 @@
   }
   #closing .script{ font-family:var(--script); font-size:clamp(48px,16vw,80px); color:var(--gold-soft); }
   #closing .seal-mini{
-    width:56px; height:56px; border-radius:50%; margin:22px auto 0;
-    background:radial-gradient(circle at 35% 30%, #d99a83, var(--blush) 60%, #a75f52 100%);
-    display:flex; align-items:center; justify-content:center; font-family:var(--script); color:#fbe9df; font-size:18px;
+    width:110px; height:110px; margin:22px auto 0;
+    display:block; object-fit:contain;
   }
   #closing p{ color:var(--parchment); opacity:.75; font-size:13px; margin-top:16px; letter-spacing:.06em; }
 
@@ -375,6 +405,13 @@
     <div class="cover-caption">Tienes una invitación</div>
   </div>
 </div>
+
+<!-- Musica de fondo: reemplaza la ruta por tu archivo (versión instrumental) -->
+<audio id="bgMusic" src="audio/perfect-instrumental.mp3" loop preload="auto"></audio>
+<button id="musicToggle" aria-label="Silenciar o activar la música">
+  <svg class="icon-playing" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+  <svg class="icon-muted" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+</button>
 
 <div id="scrollContainer">
 
@@ -777,10 +814,10 @@
     <div class="rule" style="margin-left:0"></div>
     <p>Para quienes deseen hacer un regalo en efectivo, contaremos con sobres disponibles para depositar en el cofre. También pueden contribuir mediante:</p>
     <div class="bank-box">
-      <div class="k">Depósito bancario CLABE BBVA</div>
-      <div class="v"><span id="bank-account">012320015670350209</span><button class="copy-btn" data-copy="bank-account">Copiar</button></div>
+      <div class="k">Depósito bancario — CLABE BBVA</div>
+      <div class="v"><span id="bank-account">Cuenta XXXX XXXX XXXX XXXX</span><button class="copy-btn" data-copy="bank-account">Copiar</button></div>
       <div class="k">PayPal</div>
-      <div class="v"><span id="bank-paypal">https://paypal.me/nuestraBodaJYT</span><button class="copy-btn" data-copy="bank-paypal">Copiar</button></div>
+      <div class="v"><span id="bank-paypal">correopaypal@gmail.com</span><button class="copy-btn" data-copy="bank-paypal">Copiar</button></div>
     </div>
   </div>
 </div>
@@ -906,10 +943,10 @@
     <div class="rule" style="margin-left:0"></div>
     <p>For those who'd like to give a cash gift, we'll have envelopes available to place in the chest. You can also contribute through:</p>
     <div class="bank-box">
-      <div class="k">Bank deposit BBVA</div>
-      <div class="v"><span id="bank-account-en">012320015670350209</span><button class="copy-btn" data-copy="bank-account-en">Copy</button></div>
+      <div class="k">Bank deposit — CLABE BBVA</div>
+      <div class="v"><span id="bank-account-en">Account XXXX XXXX XXXX XXXX</span><button class="copy-btn" data-copy="bank-account-en">Copy</button></div>
       <div class="k">PayPal</div>
-      <div class="v"><span id="bank-paypal-en">https://paypal.me/nuestraBodaJYT</span><button class="copy-btn" data-copy="bank-paypal-en">Copy</button></div>
+      <div class="v"><span id="bank-paypal-en">correopaypal@gmail.com</span><button class="copy-btn" data-copy="bank-paypal-en">Copy</button></div>
     </div>
   </div>
 </div>
@@ -1085,10 +1122,23 @@ document.querySelectorAll('.card-face').forEach(face => {
 const cover = document.getElementById('cover');
 const openBtn = document.getElementById('openBtn');
 const openBtnText = document.getElementById('openBtnText');
+const bgMusic = document.getElementById('bgMusic');
+const musicToggle = document.getElementById('musicToggle');
 
 function openInvitation() {
   if (!cover || cover.classList.contains('opening')) return;
   cover.classList.add('opening');
+
+  // El clic para abrir el sobre cuenta como interacción del usuario, así
+  // que aquí sí podemos arrancar el audio sin que el navegador lo bloquee.
+  if (bgMusic) {
+    bgMusic.volume = 0.5;
+    bgMusic.play().catch(() => {
+      // Si el navegador aun así lo bloquea, el botón de música
+      // permite que el invitado la active manualmente.
+    });
+  }
+
   setTimeout(() => {
     cover.classList.add('away');
     if (document.body.classList.contains('not-opened')) {
@@ -1099,6 +1149,18 @@ function openInvitation() {
 }
 if (openBtn) openBtn.addEventListener('click', openInvitation);
 if (openBtnText) openBtnText.addEventListener('click', openInvitation);
+
+if (musicToggle && bgMusic) {
+  musicToggle.addEventListener('click', () => {
+    if (bgMusic.paused) {
+      bgMusic.play().catch(() => {});
+      musicToggle.classList.remove('is-muted');
+    } else {
+      bgMusic.pause();
+      musicToggle.classList.add('is-muted');
+    }
+  });
+}
 
 function updateCountdown(){
   const target = new Date(CONFIG.ceremony.dateISO).getTime();
