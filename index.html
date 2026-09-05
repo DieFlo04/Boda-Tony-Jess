@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Antonio & Jessica — Nos Casamos</title>
+<title>Jessica & Antonio — Nos Casamos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
@@ -270,9 +270,44 @@ body.opened #musicToggle{
 #musicToggle.is-muted .icon-playing{ display: none; }
 #musicToggle.is-muted .icon-muted{ display: block; }
 
+/* ---------- Botones flotantes de navegacion (arriba / abajo) ---------- */
+.navScroll{
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity .4s ease, transform .4s ease;
+}
+body.opened .navScroll{
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.navScroll button{
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--bg-deep);
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 20px rgba(0,0,0,.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity .25s ease, transform .15s ease;
+}
+.navScroll button:active{ transform: scale(.92); }
+.navScroll button.is-disabled{ opacity: .3; pointer-events: none; }
+.navScroll button svg{ width: 20px; height: 20px; stroke: var(--gold-soft); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
   #names .bg{
     position:absolute; inset:0; z-index:0;
-    background-image:linear-gradient(180deg, rgba(18,32,26,.35), rgba(18,32,26,.85)), url('images/TyJ.jpg');
+    background-image:linear-gradient(180deg, rgba(18,32,26,.35), rgba(18,32,26,.85)), url('images/TyJ.jpeg');
     background-size:cover; background-position:center;
   }
   #names .content{
@@ -406,12 +441,22 @@ body.opened #musicToggle{
   </div>
 </div>
 
-<!-- Musica de fondo: reemplaza la ruta por tu archivo (versión instrumental) -->
-<audio id="bgMusic" src="audio/perfect-instrumental.mp3" loop preload="auto"></audio>
+<!-- Musica de fondo -->
+<audio id="bgMusic" src="audio/I'll-keep-you-safe.mp3" loop preload="auto"></audio>
 <button id="musicToggle" aria-label="Silenciar o activar la música">
   <svg class="icon-playing" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
   <svg class="icon-muted" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
 </button>
+
+<!-- Botones de navegacion arriba/abajo -->
+<div class="navScroll">
+  <button id="navUp" aria-label="Sección anterior">
+    <svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg>
+  </button>
+  <button id="navDown" aria-label="Siguiente sección">
+    <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+</div>
 
 <div id="scrollContainer">
 
@@ -419,9 +464,9 @@ body.opened #musicToggle{
     <div class="bg"></div>
     <div class="content">
       <div class="eyebrow">Nos casamos</div>
-      <div class="script">Antonio</div>
-      <span class="amp">&amp;</span>
       <div class="script">Jessica</div>
+      <span class="amp">&amp;</span>
+      <div class="script">Antonio</div>
       <div class="sub">Con la bendición de Dios y de nuestras familias</div>
     </div>
     <div class="scroll-hint">
@@ -436,7 +481,6 @@ body.opened #musicToggle{
         <div class="card-inner">
           <div class="card-face card-front">
             <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M14 6h20M14 42h20M15 6c0 8 18 8 18 8s-18 0-18 8s18 0 18 8"/><path d="M33 6c0 8-18 8-18 8s18 0 18 8s-18 0-18 8"/></svg></div>
-            <div class="eyebrow">Falta muy poco</div>
             <h2>Cuenta regresiva</h2>
             <div class="rule"></div>
             <div class="countdown-grid">
@@ -449,7 +493,6 @@ body.opened #musicToggle{
           </div>
           <div class="card-face card-back">
             <div class="card-icon"><svg viewBox="0 0 48 48"><path d="M14 6h20M14 42h20M15 6c0 8 18 8 18 8s-18 0-18 8s18 0 18 8"/><path d="M33 6c0 8-18 8-18 8s18 0 18 8s-18 0-18 8"/></svg></div>
-            <div class="eyebrow">Almost time</div>
             <h2>Countdown</h2>
             <div class="rule"></div>
             <div class="countdown-grid">
@@ -609,7 +652,6 @@ body.opened #musicToggle{
             <div class="eyebrow">Código de vestimenta</div>
             <h2>Dress Code</h2>
             <div class="rule"></div>
-            <p>Formal — te invitamos a acompañarnos con elegancia.</p>
             <div class="dress-single">
               <img src="images/dresscode.jpg" alt="Referencia de vestimenta formal">
             </div>
@@ -621,7 +663,6 @@ body.opened #musicToggle{
             <div class="eyebrow">Dress code</div>
             <h2>Dress Code</h2>
             <div class="rule"></div>
-            <p>Formal attire — we invite you to join us with elegance.</p>
             <div class="dress-single">
               <img src="images/dresscode.jpg" alt="Formal attire reference">
             </div>
@@ -719,9 +760,10 @@ body.opened #musicToggle{
   <section class="panel" id="closing">
     <div class="bg"></div>
     <div class="content">
-      <div class="script">Antonio &amp; Jessica</div>
+      <div class="script">Jessica &amp; Antonio</div>
       <img src="images/boton.png" alt="Antonio & Jessica" class="seal-mini">
       <p>Gracias por ser parte de nuestra historia</p>
+      <p>Thank you for being part of our story</p>
     </div>
   </section>
 
@@ -755,7 +797,7 @@ body.opened #musicToggle{
     <h3>Dress code</h3>
     <div class="rule" style="margin-left:0"></div>
     <p>Nuestra boda será elegante, pero no convencional.</p>
-    <p>Queremos que este día también refleje quiénes somos y que ustedes puedan hacer lo mismo. No buscamos imponer colores, estilos ni reglas estrictas: vengan elegantes, pero siendo ustedes mismos.</p>
+    <p>Queremos que este día también refleje quiénes somos y que ustedes puedan hacer lo mismo.</p>
     <p>Usen aquello que los haga sentir cómodos, guapos y auténticos. Vestido, traje, conjunto, colores, estampados o ese detalle que los representa… queremos celebrar rodeados de nuestra familia y amigos tal como son.</p>
     <p>La elegancia es la ocasión; el estilo lo ponen ustedes.🤍</p>
   </div>
@@ -799,7 +841,6 @@ body.opened #musicToggle{
     <div class="rule" style="margin-left:0"></div>
     <ul class="note-list">
       <li>¡Por favor ser puntuales!</li>
-      <li>Queremos que disfrutes de esta fiesta al máximo, por eso decidimos que sea un evento sólo para adultos.</li>
       <li>¡Confirmar asistencia a la brevedad, antes de la fecha indicada!</li>
       <li>Lleva abrigo para disfrutar de los espacios exteriores.</li>
       <li>Olvídate de todo y a disfrutar!!!</li>
@@ -815,9 +856,9 @@ body.opened #musicToggle{
     <p>Para quienes deseen hacer un regalo en efectivo, contaremos con sobres disponibles para depositar en el cofre. También pueden contribuir mediante:</p>
     <div class="bank-box">
       <div class="k">Depósito bancario — CLABE BBVA</div>
-      <div class="v"><span id="bank-account">Cuenta XXXX XXXX XXXX XXXX</span><button class="copy-btn" data-copy="bank-account">Copiar</button></div>
+      <div class="v"><span id="bank-account">012320015670350209</span><button class="copy-btn" data-copy="bank-account">Copiar</button></div>
       <div class="k">PayPal</div>
-      <div class="v"><span id="bank-paypal">correopaypal@gmail.com</span><button class="copy-btn" data-copy="bank-paypal">Copiar</button></div>
+      <div class="v"><span id="bank-paypal">https://paypal.me/nuestraBodaJYT</span><button class="copy-btn" data-copy="bank-paypal">Copiar</button></div>
     </div>
   </div>
 </div>
@@ -884,7 +925,7 @@ body.opened #musicToggle{
     <h3>Dress code</h3>
     <div class="rule" style="margin-left:0"></div>
     <p>Our wedding will be elegant, but not conventional.</p>
-    <p>We want this day to also reflect who we are, and for you to be able to do the same. We're not looking to impose colors, styles, or strict rules: come elegant, but be yourselves.</p>
+    <p>We want this day to also reflect who we are, and for you to be able to do the same.</p>
     <p>Wear whatever makes you feel comfortable, handsome, and authentic. Dress, suit, outfit, colors, patterns, or that detail that represents you… we want to celebrate surrounded by our family and friends just as they are.</p>
     <p>Elegance is the occasion; the style is yours to choose. 🤍</p>
   </div>
@@ -928,7 +969,6 @@ body.opened #musicToggle{
     <div class="rule" style="margin-left:0"></div>
     <ul class="note-list">
       <li>Please be on time!</li>
-      <li>We want you to enjoy this party to the fullest, so we've decided to make it an adults-only event.</li>
       <li>Please confirm your attendance as soon as possible, before the date shown!</li>
       <li>Bring a jacket to enjoy the outdoor spaces.</li>
       <li>Forget about everything else and enjoy!!!</li>
@@ -944,9 +984,9 @@ body.opened #musicToggle{
     <p>For those who'd like to give a cash gift, we'll have envelopes available to place in the chest. You can also contribute through:</p>
     <div class="bank-box">
       <div class="k">Bank deposit — CLABE BBVA</div>
-      <div class="v"><span id="bank-account-en">Account XXXX XXXX XXXX XXXX</span><button class="copy-btn" data-copy="bank-account-en">Copy</button></div>
+      <div class="v"><span id="bank-account-en">012320015670350209</span><button class="copy-btn" data-copy="bank-account-en">Copy</button></div>
       <div class="k">PayPal</div>
-      <div class="v"><span id="bank-paypal-en">correopaypal@gmail.com</span><button class="copy-btn" data-copy="bank-paypal-en">Copy</button></div>
+      <div class="v"><span id="bank-paypal-en">https://paypal.me/nuestraBodaJYT</span><button class="copy-btn" data-copy="bank-paypal-en">Copy</button></div>
     </div>
   </div>
 </div>
@@ -1129,14 +1169,9 @@ function openInvitation() {
   if (!cover || cover.classList.contains('opening')) return;
   cover.classList.add('opening');
 
-  // El clic para abrir el sobre cuenta como interacción del usuario, así
-  // que aquí sí podemos arrancar el audio sin que el navegador lo bloquee.
   if (bgMusic) {
     bgMusic.volume = 0.5;
-    bgMusic.play().catch(() => {
-      // Si el navegador aun así lo bloquea, el botón de música
-      // permite que el invitado la active manualmente.
-    });
+    bgMusic.play().catch(() => {});
   }
 
   setTimeout(() => {
@@ -1287,6 +1322,37 @@ $$('.copy-btn').forEach(btn=>{
     });
   });
 });
+
+/* ---------- Navegacion con botones arriba / abajo ---------- */
+const navUp = document.getElementById('navUp');
+const navDown = document.getElementById('navDown');
+const allPanels = $$('.panel', scrollContainer);
+
+function currentPanelIndex(){
+  let idx = 0;
+  let minDiff = Infinity;
+  allPanels.forEach((p, i) => {
+    const diff = Math.abs(p.getBoundingClientRect().top);
+    if (diff < minDiff) { minDiff = diff; idx = i; }
+  });
+  return idx;
+}
+function updateNavButtons(){
+  const idx = currentPanelIndex();
+  navUp.classList.toggle('is-disabled', idx <= 0);
+  navDown.classList.toggle('is-disabled', idx >= allPanels.length - 1);
+}
+function goToPanel(idx){
+  idx = Math.max(0, Math.min(allPanels.length - 1, idx));
+  allPanels[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+navUp.addEventListener('click', () => goToPanel(currentPanelIndex() - 1));
+navDown.addEventListener('click', () => goToPanel(currentPanelIndex() + 1));
+scrollContainer.addEventListener('scroll', () => {
+  clearTimeout(scrollContainer._navTimer);
+  scrollContainer._navTimer = setTimeout(updateNavButtons, 80);
+}, { passive: true });
+updateNavButtons();
 </script>
 </body>
 </html>
