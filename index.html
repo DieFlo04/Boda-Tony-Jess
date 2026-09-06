@@ -337,19 +337,40 @@ body.opened .navScroll{
 
   .map-frame{ width:100%; height:220px; border:0; border-radius:var(--r); margin-top:18px; filter:sepia(.15) saturate(1.1); }
 
-  /* ===== Estilos de galería (restaurados) ===== */
-  #gallery .card-face{ max-width:460px; padding:34px 0; }
-  .carousel{ display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory; padding:0 50px 6px; -webkit-overflow-scrolling:touch; }
+  /* ===== Estilos de galería (corregidos para móviles) ===== */
+  #gallery .card-face{
+    max-width:460px;
+    width:100%;
+    padding:34px 20px;
+  }
+  .carousel{
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    padding:0 34px 6px;
+    -webkit-overflow-scrolling:touch;
+  }
   .carousel::-webkit-scrollbar{ display:none; }
   .carousel img{
-    flex:0 0 72%; scroll-snap-align:center; height:380px; object-fit:cover;
-    border-radius:10px; box-shadow:0 14px 30px rgba(0,0,0,.25);
+    flex:0 0 70%;
+    max-width:260px;
+    width:70%;
+    aspect-ratio: 3 / 4;
+    height:auto;
+    scroll-snap-align:center;
+    object-fit:cover;
+    border-radius:10px;
+    box-shadow:0 14px 30px rgba(0,0,0,.25);
   }
   .dots{ display:flex; justify-content:center; gap:6px; margin-top:16px; }
   .dots span{ width:6px; height:6px; border-radius:50%; background:var(--line); transition:.2s; }
   .dots span.active{ background:var(--gold); width:16px; border-radius:4px; }
 
-  .carousel-wrapper{ position:relative; margin-top:8px; }
+  .carousel-wrapper{
+    position:relative;
+    margin:8px -20px 0;
+  }
   .carousel-btn{
     position:absolute; top:50%; transform:translateY(-50%);
     width:36px; height:36px; border-radius:50%;
@@ -359,8 +380,8 @@ body.opened .navScroll{
     transition:background .2s, transform .2s;
   }
   .carousel-btn:hover{ background:var(--gold); color:#241a06; }
-  .carousel-btn.prev{ left:10px; }
-  .carousel-btn.next{ right:10px; }
+  .carousel-btn.prev{ left:2px; }
+  .carousel-btn.next{ right:2px; }
   .swipe-hint{
     display:flex; align-items:center; justify-content:center; gap:8px;
     margin-top:14px; font-size:11px; letter-spacing:.14em; text-transform:uppercase;
@@ -443,26 +464,6 @@ body.opened .navScroll{
   .thanks .mark{ font-family:var(--serif); font-style:italic; font-size:26px; color:var(--ink); }
   .thanks p{ text-align:center; margin-top:8px; }
   form.hide, .modal > .btn.hide, .modal > .rule.hide, .modal > h3.hide, .modal > p.hide{ display:none; }
-
-  /* ===== Media query para móviles ===== */
-  @media (max-width: 600px) {
-    #gallery .card-face{
-      max-width:100%;
-      padding:34px 8px;
-    }
-    .carousel-btn{
-      width:30px;
-      height:30px;
-      font-size:18px;
-    }
-    .carousel-btn.prev{ left:5px; }
-    .carousel-btn.next{ right:5px; }
-    /* Opcional: reducir un poco la altura de las imágenes para que quepan mejor */
-    .carousel img{
-      height:340px;
-    }
-  }
-  /* ===== Fin media query ===== */
 
   @media (prefers-reduced-motion:reduce){
     *{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
