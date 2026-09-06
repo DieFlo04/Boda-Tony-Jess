@@ -71,6 +71,7 @@
     transition:transform .7s cubic-bezier(.4,.2,.2,1);
     transform-style:preserve-3d;
     cursor:pointer;
+    display:grid; /* antes no tenía display:grid */
   }
   .card.is-flipped .card-inner{ transform:rotateY(180deg); }
   .card-face{
@@ -79,12 +80,16 @@
     box-shadow:var(--shadow);
     padding:34px 30px; text-align:center;
     backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    grid-area:1/1; /* ambas caras en la misma celda */
   }
   .card-front{ position:relative; }
   .card-back{
-    position:absolute; inset:0; transform:rotateY(180deg);
+    grid-area:1/1; /* ocupa la misma celda */
+    transform:rotateY(180deg);
     display:flex; flex-direction:column; align-items:center; justify-content:center;
+    /* se eliminó position:absolute; inset:0; */
   }
+  /* ===== FIN AJUSTE ===== */
   .card-badge{
     position:absolute; top:-34px; left:50%; transform:translateX(-50%);
     width:72px; height:72px; z-index:6; pointer-events:none;
@@ -345,6 +350,28 @@ body.opened .navScroll{
   .dots span{ width:6px; height:6px; border-radius:50%; background:var(--line); transition:.2s; }
   .dots span.active{ background:var(--gold); width:16px; border-radius:4px; }
 
+  /* ===== Nuevos estilos para la pista de deslizar y botones del carrusel ===== */
+  .carousel-wrapper{ position:relative; margin-top:8px; }
+  .carousel-btn{
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:36px; height:36px; border-radius:50%;
+    background:rgba(18,32,26,.7); color:var(--gold-soft);
+    border:1px solid var(--line); display:flex; align-items:center; justify-content:center;
+    z-index:5; font-size:22px; line-height:1; cursor:pointer;
+    transition:background .2s, transform .2s;
+  }
+  .carousel-btn:hover{ background:var(--gold); color:#241a06; }
+  .carousel-btn.prev{ left:10px; }
+  .carousel-btn.next{ right:10px; }
+  .swipe-hint{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin-top:14px; font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--ink-soft); opacity:.7;
+  }
+  .swipe-hint svg{ width:22px; height:22px; stroke:var(--gold); fill:none; stroke-width:1.6; animation:swipe 1.8s ease-in-out infinite; }
+  @keyframes swipe{ 0%,100%{ transform:translateX(0); } 50%{ transform:translateX(8px); } }
+  /* ===== Fin nuevos estilos ===== */
+
   .dress-single{ display:flex; justify-content:center; margin-top:20px; }
   .dress-single img{
     width:100%; max-width:280px; height:auto; object-fit:contain;
@@ -352,7 +379,7 @@ body.opened .navScroll{
   }
   #closing .bg{
     position:absolute; inset:0; z-index:0;
-    background-image:linear-gradient(180deg, rgba(18,32,26,.55), rgba(18,32,26,.82)), url('images/cierre.jpeg');
+    background-image:linear-gradient(180deg, rgba(18,32,26,.55), rgba(18,32,26,.82)), url('images/cierre.jpg');
     background-size:cover; background-position:center;
   }
   #closing .content{
@@ -587,20 +614,28 @@ body.opened .navScroll{
             <div class="eyebrow">Nuestra historia</div>
             <h2>Galería</h2>
             <div class="rule"></div>
-            <div class="carousel" id="carousel">
-              <img src="images/foto-1.jpeg" alt="Foto de la pareja 1" loading="lazy">
-              <img src="images/foto-2.jpeg" alt="Foto de la pareja 2" loading="lazy">
-              <img src="images/foto-3.jpeg" alt="Foto de la pareja 3" loading="lazy">
-              <img src="images/foto-4.jpeg" alt="Foto de la pareja 4" loading="lazy">
-              <img src="images/foto-5.jpeg" alt="Foto de la pareja 5" loading="lazy">
-              <img src="images/foto-6.jpeg" alt="Foto de la pareja 6" loading="lazy">
-              <img src="images/foto-7.jpeg" alt="Foto de la pareja 7" loading="lazy">
-              <img src="images/foto-8.jpeg" alt="Foto de la pareja 8" loading="lazy">
-              <img src="images/foto-9.jpeg" alt="Foto de la pareja 9" loading="lazy">
-              <img src="images/foto-10.jpg" alt="Foto de la pareja 10" loading="lazy">
-              <img src="images/foto-11.jpeg" alt="Foto de la pareja 11" loading="lazy">
+            <div class="carousel-wrapper">
+              <button class="carousel-btn prev" aria-label="Foto anterior">‹</button>
+              <div class="carousel" id="carousel">
+                <img src="images/foto-1.jpeg" alt="Foto de la pareja 1" loading="lazy">
+                <img src="images/foto-2.jpeg" alt="Foto de la pareja 2" loading="lazy">
+                <img src="images/foto-3.jpeg" alt="Foto de la pareja 3" loading="lazy">
+                <img src="images/foto-4.jpeg" alt="Foto de la pareja 4" loading="lazy">
+                <img src="images/foto-5.jpeg" alt="Foto de la pareja 5" loading="lazy">
+                <img src="images/foto-6.jpeg" alt="Foto de la pareja 6" loading="lazy">
+                <img src="images/foto-7.jpeg" alt="Foto de la pareja 7" loading="lazy">
+                <img src="images/foto-8.jpeg" alt="Foto de la pareja 8" loading="lazy">
+                <img src="images/foto-9.jpeg" alt="Foto de la pareja 9" loading="lazy">
+                <img src="images/foto-10.jpg" alt="Foto de la pareja 10" loading="lazy">
+                <img src="images/foto-11.jpeg" alt="Foto de la pareja 11" loading="lazy">
+              </div>
+              <button class="carousel-btn next" aria-label="Foto siguiente">›</button>
             </div>
             <div class="dots" id="carouselDots"></div>
+            <div class="swipe-hint">
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/><path d="M19 12l-6-6 6 6"/></svg>
+              Desliza para ver más fotos
+            </div>
             <div class="card-flip-hint"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2M4 12v5h5"/></svg> Toca fuera de las fotos para ver en inglés</div>
           </div>
           <div class="card-face card-back">
@@ -927,7 +962,7 @@ body.opened .navScroll{
     <p>Our wedding will be elegant, but not conventional.</p>
     <p>We want this day to also reflect who we are, and for you to be able to do the same.</p>
     <p>Wear whatever makes you feel comfortable, handsome, and authentic. Dress, suit, outfit, colors, patterns, or that detail that represents you… we want to celebrate surrounded by our family and friends just as they are.</p>
-    <p>Elegance is the occasion; the style is yours to choose. 🤍</p>
+    <p>Elegance is the occasion; the style is yours to choose.🤍</p>
   </div>
 </div>
 
@@ -1225,6 +1260,17 @@ carousel.addEventListener('scroll', () => {
   const idx = Math.round(carousel.scrollLeft / (carousel.clientWidth*0.72+14));
   $$('span', dotsWrap).forEach((d,i)=> d.classList.toggle('active', i===idx));
 }, { passive:true });
+
+/* ===== Nuevo código para los botones del carrusel ===== */
+const prevBtn = document.querySelector('.carousel-btn.prev');
+const nextBtn = document.querySelector('.carousel-btn.next');
+function scrollCarousel(direction) {
+  const cardWidth = carousel.clientWidth * 0.72 + 14;
+  carousel.scrollBy({ left: direction * cardWidth, behavior: 'smooth' });
+}
+if (prevBtn) prevBtn.addEventListener('click', () => scrollCarousel(-1));
+if (nextBtn) nextBtn.addEventListener('click', () => scrollCarousel(1));
+/* ===== Fin nuevo código ===== */
 
 $$('.card[data-flip]').forEach(card => {
   const inner = $('.card-inner', card);
